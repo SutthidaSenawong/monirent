@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { FacebookProvider, CustomChat } from 'react-facebook';
 // import ReactDOM from 'react-dom';
