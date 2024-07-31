@@ -82,5 +82,12 @@ createServer({
       const id = request.params.id;
       return schema.monitors.find(id);
     });
+    // Allow passthrough for Facebook SDK requests
+    this.passthrough(
+      'https://web.facebook.com/plugins/customer_chat/SDK/?app_id=1169080330965804&channel=https%3A%2F%2Fstaticxx.facebook.com%2Fx%2Fconnect%2Fxd_arbiter%2F%3Fversion%3D46%23cb%3Dfab78d7378c372b90%26domain%3Delegant-faun-a4f8ea.netlify.app%26is_canvas%3Dfalse%26origin%3Dhttps%3A%2F%2Felegant-faun-a4f8ea.netlify.app%2Ff4d02a98e7c74d55a%26relation%3Dparent.parent&current_url=https%3A%2F%2Felegant-faun-a4f8ea.netlify.app%2F&event_name=chat_plugin_sdk_facade_create&is_loaded_by_facade=true&loading_time=0&locale=en_US&log_id=dfcf2e00-2e61-4981-8d1c-3e74af588ec7&page_id=280517075156100&request_time=1722400700903&sdk=joey&should_use_new_domain=false&suppress_http_code=1'
+    );
+    this.passthrough(
+      'https://connect.facebook.net/plugins/customer_chat/SDK/?app_id=1169080330965804&channel=https%3A%2F%2Fstaticxx.facebook.com%2Fx%2Fconnect%2Fxd_arbiter%2F%3Fversion%3D46%23cb%3Dfab78d7378c372b90%26domain%3Delegant-faun-a4f8ea.netlify.app%26is_canvas%3Dfalse%26origin%3Dhttps%3A%2F%2Felegant-faun-a4f8ea.netlify.app%2Ff4d02a98e7c74d55a%26relation%3Dparent.parent&current_url=https%3A%2F%2Felegant-faun-a4f8ea.netlify.app%2F&event_name=chat_plugin_sdk_facade_create&is_loaded_by_facade=true&loading_time=0&locale=en_US&log_id=dfcf2e00-2e61-4981-8d1c-3e74af588ec7&page_id=280517075156100&request_time=1722400700903&sdk=joey&should_use_new_domain=false&suppress_http_code=1'
+    );
   },
 });
