@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './src/Component/Layout';
 import Monitors from './src/Monitors';
 import MonitorsDetail from './src/MonitorsDetail';
-import './server';
+// import './server';
 function App() {
   return (
     <BrowserRouter>

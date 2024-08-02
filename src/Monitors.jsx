@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import { getMonitors } from '../api';
 
 import Slide from './Slide';
-import LG27 from './src/assets/LG27.png';
-import MSI25 from './src/assets/MSI25.png';
 
 export default function Monitors() {
   const [monitors, setMonitors] = React.useState([]);
@@ -17,7 +15,7 @@ export default function Monitors() {
       try {
         const data = await getMonitors();
         setMonitors(data);
-        // console.log(monitors.imageUrl);
+        console.log(monitors.imageUrl);
       } catch (err) {
         setError(err);
       } finally {
