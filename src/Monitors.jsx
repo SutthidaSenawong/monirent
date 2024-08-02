@@ -15,6 +15,7 @@ export default function Monitors() {
       try {
         const data = await getMonitors();
         setMonitors(data);
+        // console.log(monitors.imageUrl);
       } catch (err) {
         setError(err);
       } finally {
@@ -29,7 +30,7 @@ export default function Monitors() {
       <Link to={`/${monitor.id}`}>
         <div className="monitor-container">
           <img
-            src={monitor.imageUrl}
+            src={`${monitor.imageUrl}`}
             alt={monitor.name}
             className="monitor-img"
           />

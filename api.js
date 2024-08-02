@@ -1,53 +1,61 @@
-// A function whose only purpose is to delay execution
-// for the specified # of milliseconds when used w/ `await`
-// e.g. inside an async function:
-// await sleep(2000)  => pauses the function for 2 seconds before moving on
+import { initializeApp } from 'firebase/app';
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+} from 'firebase/firestore';
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyCT9et8S7SA-IdSMxPylb7LUJUNdQnIdFA',
+  authDomain: 'monirent-a6071.firebaseapp.com',
+  projectId: 'monirent-a6071',
+  storageBucket: 'monirent-a6071.appspot.com',
+  messagingSenderId: '900448426661',
+  appId: '1:900448426661:web:4b8fa995fb04fbebd94b4c',
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+// Refactoring the fetching functions below
+const monitorsCollectionRef = collection(db, 'monitors');
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(() => resolve(), ms));
 }
-
-export async function getMonitors(id) {
-  const url = id ? `/api/monitors/${id}` : '/api/monitors';
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw {
-      message: 'Failed to fetch monitors',
-      statusText: res.statusText,
-      status: res.status,
-    };
-  }
-  const data = await res.json();
-  return data.monitors;
+export async function getMonitors() {
+  const snapshot = await getDocs(monitorsCollectionRef);
+  const monitors = snapshot.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  }));
+  // console.log(monitors);
+  return monitors;
+}
+export async function getMonitor(id) {
+  const docRef = doc(db, 'monitors', id);
+  const snapshot = await getDoc(docRef);
+  return {
+    ...snapshot.data(),
+    id: snapshot.id,
+  };
 }
 
-// export async function getHostVans(id) {
-//   const url = id ? `/api/host/vans/${id}` : '/api/host/vans';
+// export async function getMonitors(id) {
+//   const url = id ? `/api/monitors/${id}` : '/api/monitors';
 //   const res = await fetch(url);
 //   if (!res.ok) {
 //     throw {
-//       message: 'Failed to fetch vans',
+//       message: 'Failed to fetch monitors',
 //       statusText: res.statusText,
 //       status: res.status,
 //     };
 //   }
 //   const data = await res.json();
-//   return data.vans;
-// }
-
-// export async function loginUser(creds) {
-//   const res = await fetch('/api/login', {
-//     method: 'post',
-//     body: JSON.stringify(creds),
-//   });
-//   const data = await res.json();
-
-//   if (!res.ok) {
-//     throw {
-//       message: data.message,
-//       statusText: res.statusText,
-//       status: res.status,
-//     };
-//   }
-
-//   return data;
+//   return data.monitors;
 // }

@@ -1,22 +1,52 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { HiArrowNarrowLeft } from 'react-icons/hi';
+import { getMonitor } from '../api';
 
 export default function MonitorsDetail() {
   const [monitor, setMonitor] = React.useState(null);
-  const params = useParams();
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
+  const { id } = useParams();
 
   React.useEffect(() => {
-    fetch(`/api/monitors/${params.id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log('data', data)
-        setMonitor(data.monitors);
-      });
-  }, [params.id]);
+    // fetch(`/api/monitors/${params.id}`)
+    //   .then((res) => res.json())
+    //   .then((data) => {
+    //     // console.log('data', data)
+    //     setMonitor(data.monitors);
+    //   });
+    async function loadMonitor() {
+      setLoading(true);
+      try {
+        const data = await getMonitor(id);
+        setMonitor(data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadMonitor();
+  }, [id]);
+
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
+  if (error) {
+    return <h1>There was an error: {error.message}</h1>;
+  }
+  const specificationOrder = [
+    'MODEL',
+    'CONNECTIVITY',
+    'DISPLAY',
+    'Response Time',
+    'DIMENSIONS',
+    'COLOR',
+  ];
   return (
     <div>
-      {monitor ? (
+      {monitor && (
         <div>
           <Link to=".." relative="path">
             <p className="back-btn">
@@ -42,13 +72,12 @@ export default function MonitorsDetail() {
                 <h3>Specifications</h3>
                 <p>{monitor.info}</p>
                 <ul className="specifications-list">
-                  {monitor.spec.map((spec, index) => (
-                    <li key={index}>
-                      {Object.entries(spec).map(([key, value]) => (
-                        <div key={key} className="spec">
-                          <strong>{key}</strong> {value}
-                        </div>
-                      ))}
+                  {specificationOrder.map((key) => (
+                    <li key={key}>
+                      <div className="spec">
+                        {/* <strong>{key}</strong> {value} */}
+                        <strong>{key}:</strong> {monitor.spec[key]}
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -56,8 +85,6 @@ export default function MonitorsDetail() {
             </div>
           </div>
         </div>
-      ) : (
-        <h2>Loading...</h2>
       )}
     </div>
   );
