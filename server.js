@@ -48,19 +48,19 @@
 //       id: '3',
 //       name: '32" SAMSUNG 2K ',
 //       price: 750,
-//       description: 'unlock your experience',
+//       description:
+//         'SAMSUNG 32" Desktop Monitor, VA panel, 2560 x 1440 QHD, 165Hz, 1ms response time, AMD FreeSync™ Premium, HDR10 support, adjustability',
 //       imageUrl: Portable,
-//       info: "Ultra-Slim Portable Display - With a thickness of just 1 cm and weighing 655g, this display is easy to slip into your bag and take anywhere, it's perfect for on-the-go use.",
+//       info: 'Experience full immersion with QHD resolution, HDR10 support, and AMD FreeSync Premium. Enjoy real-time responsiveness with a 165Hz refresh rate. The ergonomic design ensures user comfort, allowing you to tilt, swivel, pivot, and adjust the screen to your preference.',
 //       spec: [
-//         { MODEL: '27MR400-B' },
+//         { MODEL: 'ODYSSEY G5 LS32CG510EEXXT' },
 //         {
-//           CONNECTIVITY:
-//             '2 USB-C ports, Mini HDMI, 3.5mm audio jack (headphone).',
+//           CONNECTIVITY: '2x HDMI, 1xDP',
 //         },
-//         { DISPLAY: 'IPS 15.6-inch (1920x1080p)' },
-//         { 'Response Time': '-' },
-//         { DIMENSIONS: '35.5(W) x 0.5(D) x 22(H) cm x  655g' },
-//         { COLOR: 'NTSC 72%' },
+//         { DISPLAY: 'VA 32-inch (2560x1440p)' },
+//         { 'Response Time': '1ms' },
+//         { DIMENSIONS: '719.20 x 597.40 x 248.80 mm x  6.2 Kg' },
+//         { COLOR: 'sRGB 100%' },
 //       ],
 //     });
 //   },

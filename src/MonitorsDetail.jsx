@@ -36,14 +36,14 @@ export default function MonitorsDetail() {
   if (error) {
     return <h1>There was an error: {error.message}</h1>;
   }
-  const specificationOrder = [
-    'MODEL',
-    'CONNECTIVITY',
-    'DISPLAY',
-    'Response Time',
-    'DIMENSIONS',
-    'COLOR',
-  ];
+  // const specificationOrder = [
+  //   'MODEL',
+  //   'CONNECTIVITY',
+  //   'DISPLAY',
+  //   'Response Time',
+  //   'DIMENSIONS',
+  //   'COLOR',
+  // ];
   return (
     <div>
       {monitor && (
@@ -65,18 +65,17 @@ export default function MonitorsDetail() {
                   <span>{monitor.price} THB</span>/week
                 </p>
 
-                <a className="rent-btn">Rent this monitor</a>
+                <a className="rent-btn">Rent this</a>
               </div>
 
               <div className="specifications">
                 <h3>Specifications</h3>
                 <p>{monitor.info}</p>
                 <ul className="specifications-list">
-                  {specificationOrder.map((key) => (
+                  {Object.entries(monitor.spec).map(([key, value]) => (
                     <li key={key}>
                       <div className="spec">
-                        {/* <strong>{key}</strong> {value} */}
-                        <strong>{key}:</strong> {monitor.spec[key]}
+                        <strong>{key}:</strong> {value}
                       </div>
                     </li>
                   ))}
