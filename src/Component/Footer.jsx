@@ -12,7 +12,11 @@ export default function Footer() {
       >
         <FaFacebookSquare className="social-icon" />
       </a>
-      <a href="https://www.instagram.com/monirent_cnx/">
+      <a
+        href="https://www.instagram.com/monirent_cnx/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <BsInstagram className="social-icon" />
       </a>
     </div>

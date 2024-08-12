@@ -65,7 +65,12 @@ export default function MonitorsDetail() {
                   <span>{monitor.price} THB</span>/week
                 </p>
 
-                <a href="http://m.me/280517075156100" className="rent-btn">
+                <a
+                  href="http://m.me/280517075156100"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rent-btn"
+                >
                   Rent this
                 </a>
               </div>
