@@ -149,6 +149,7 @@ button:focus-visible {
   display: flex;
   flex-direction: row;
   margin-bottom: 15px;
+  gap: 5px;
 }
 .monitor-container div {
   flex: 1;
@@ -265,6 +266,7 @@ span {
     flex-direction: column;
     width: auto;
     height: 100%;
+    padding: 20px;
   }
   .monitor-container div {
     width: 100%;
