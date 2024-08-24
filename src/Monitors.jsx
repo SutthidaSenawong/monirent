@@ -27,7 +27,7 @@ export default function Monitors() {
 
   const monitorsElements = monitors.map((monitor) => (
     <div key={monitor.id}>
-      <Link to={`/${monitor.id}`}>
+      <Link to={`/monitors/${monitor.id}`}>
         <div className="monitor-container">
           <img
             src={`${monitor.imageUrl}`}
@@ -56,7 +56,7 @@ export default function Monitors() {
   return (
     <>
       <Slide />
-      <h3>Discover Your Perfect View</h3>
+      <h3>Monitors For Rent in Chiang Mai </h3>
       <div className="all-monitors">{monitorsElements}</div>
     </>
   );

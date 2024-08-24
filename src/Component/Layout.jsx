@@ -10,7 +10,6 @@ export default function Layout() {
       <Header />
       <main>
         <Outlet />
-        {/* <Messenger /> */}
       </main>
       <Footer />
     </div>
