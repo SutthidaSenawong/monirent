@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp _headers dist/_headers && cp robots.txt dist/robots.txt",
+    "build": "vite build && node generate-sitemap.js && cp _headers dist/_headers && cp robots.txt dist/robots.txt",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -30,6 +30,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
     "miragejs": "^0.2.0-alpha.3",
+    "sitemap": "^8.0.0",
     "vite": "^5.3.1"
   }
 }
