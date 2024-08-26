@@ -1,6 +1,5 @@
-// generate-sitemap.js
-const fs = require('fs');
-const { SitemapStream, streamToPromise } = require('sitemap');
+import fs from 'fs';
+import { SitemapStream, streamToPromise } from 'sitemap';
 
 // Create a sitemap stream
 const sitemap = new SitemapStream({ hostname: 'https://www.moni.rent' });
