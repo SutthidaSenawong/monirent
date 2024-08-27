@@ -56,7 +56,7 @@ export default function Monitors() {
   return (
     <>
       <Slide />
-      <h1>Monitors For Rent in Chiang Mai </h1>
+      <h2>Monitors For Rent in Chiang Mai </h2>
       <div className="all-monitors">{monitorsElements}</div>
     </>
   );
