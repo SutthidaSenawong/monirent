@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <div className="footer">
       <a
-        href="https://www.facebook.com/profile.php?id=61560818636615"
+        href="https://www.facebook.com/rent.monitor.chinagmai.monirent"
         target="_blank"
         rel="noopener noreferrer"
       >
