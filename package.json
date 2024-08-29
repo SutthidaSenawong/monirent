@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node generate-sitemap.js && cp _headers dist/_headers && cp robots.txt dist/robots.txt",
+    "build": "vite build && node generate-sitemap.js && cp _redirects dist/_redirects || true && cp robots.txt dist/robots.txt",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
