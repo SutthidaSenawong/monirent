@@ -8,7 +8,6 @@ const dynamicRoutes = [
   '/rent-monitors-chiangmai/4',
   '/rent-monitors-chiangmai/5',
   '/rent-monitors-chiangmai/6',
-  // Add more dynamic routes as needed
 ];
 // Create a sitemap stream
 const sitemap = new SitemapStream({ hostname: 'https://www.moni.rent' });
