@@ -36,14 +36,7 @@ export default function MonitorsDetail() {
   if (error) {
     return <h1>There was an error: {error.message}</h1>;
   }
-  // const specificationOrder = [
-  //   'MODEL',
-  //   'CONNECTIVITY',
-  //   'DISPLAY',
-  //   'Response Time',
-  //   'DIMENSIONS',
-  //   'COLOR',
-  // ];
+
   return (
     <div>
       {monitor && (
