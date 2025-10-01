@@ -32,19 +32,24 @@ function sleep(ms) {
 }
 export async function getMonitors() {
   // กำหนด query เรียง category ก่อน แล้วเรียง id ต่อ
-  const q = query(
-    monitorsCollectionRef,
-    orderBy('category', 'asc'),
-    orderBy('id', 'asc')
-  );
+  // const q = query(
+  //   monitorsCollectionRef,
+  //   orderBy('category', 'asc'),
+  //   orderBy('id', 'asc')
+  // );
 
-  const snapshot = await getDocs(q);
+  const snapshot = await getDocs(monitorsCollectionRef);
   const monitors = snapshot.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
   }));
   // console.log(monitors);
-
+  monitors.sort((a, b) => {
+    if (a.category < b.category) return -1;
+    if (a.category > b.category) return 1;
+    // แปลง id เป็น number ถ้า id เป็น string
+    return Number(a.id) - Number(b.id);
+  });
   return monitors;
 }
 export async function getMonitor(id) {

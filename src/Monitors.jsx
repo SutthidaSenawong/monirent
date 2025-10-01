@@ -14,8 +14,9 @@ export default function Monitors() {
       setLoading(true);
       try {
         const data = await getMonitors();
+        console.log('Fetched monitors:', data);
         setMonitors(data);
-        console.log(monitors.imageUrl);
+        // console.log(monitors.imageUrl);
       } catch (err) {
         setError(err);
       } finally {
