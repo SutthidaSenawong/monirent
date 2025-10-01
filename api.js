@@ -40,6 +40,14 @@ export async function getMonitors() {
     id: doc.id,
   }));
   // console.log(monitors);
+  // แปลง id เป็น number แล้ว sort หลังจากดึง
+  monitors.sort((a, b) => {
+    // เรียงตาม category ก่อน
+    if (a.category < b.category) return -1;
+    if (a.category > b.category) return 1;
+    // ถ้า category เท่ากัน เรียง id เป็น number
+    return Number(a.id) - Number(b.id);
+  });
   return monitors;
 }
 export async function getMonitor(id) {
