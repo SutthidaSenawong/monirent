@@ -32,7 +32,11 @@ function sleep(ms) {
 }
 export async function getMonitors() {
   // กำหนด query เรียง category ก่อน แล้วเรียง id ต่อ
-  const q = query(monitorsCollectionRef, orderBy('category'), orderBy('id'));
+  const q = query(
+    monitorsCollectionRef,
+    orderBy('category', 'asc'),
+    orderBy('id', 'asc')
+  );
 
   const snapshot = await getDocs(q);
   const monitors = snapshot.docs.map((doc) => ({
