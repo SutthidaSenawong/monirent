@@ -5,6 +5,8 @@ import {
   doc,
   getDocs,
   getDoc,
+  query,
+  orderBy,
 } from 'firebase/firestore';
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -29,6 +31,9 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(() => resolve(), ms));
 }
 export async function getMonitors() {
+  // กำหนด query เรียง category ก่อน แล้วเรียง id ต่อ
+  const q = query(monitorsCollectionRef, orderBy('category'), orderBy('id'));
+
   const snapshot = await getDocs(monitorsCollectionRef);
   const monitors = snapshot.docs.map((doc) => ({
     ...doc.data(),
