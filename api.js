@@ -34,7 +34,7 @@ export async function getMonitors() {
   // กำหนด query เรียง category ก่อน แล้วเรียง id ต่อ
   const q = query(monitorsCollectionRef, orderBy('category'), orderBy('id'));
 
-  const snapshot = await getDocs(monitorsCollectionRef);
+  const snapshot = await getDocs(q);
   const monitors = snapshot.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
