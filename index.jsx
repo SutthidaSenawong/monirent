@@ -5,18 +5,24 @@ import Layout from './src/Component/Layout';
 import Monitors from './src/Monitors';
 import MonitorsDetail from './src/MonitorsDetail';
 import Home from './src/Component/Home';
+import Cart from './src/Cart';
+import Checkout from "./src/Checkout";
 // import './server';
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path='/' element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="/rent-monitors-chiangmai" element={<Monitors />} />
-
+          <Route path='/rent-monitors-chiangmai' element={<Monitors />} />
           <Route
-            path="/rent-monitors-chiangmai/:id"
+            path='/rent-monitors-chiangmai/:id'
             element={<MonitorsDetail />}
+          />
+          <Route path='/rent-monitors-chiangmai/cart' element={<Cart />} />
+          <Route
+            path='/rent-monitors-chiangmai/checkout'
+            element={<Checkout />}
           />
         </Route>
       </Routes>
