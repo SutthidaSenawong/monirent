@@ -428,8 +428,6 @@ span {
   flex: 1;
   min-width: 0;
   max-width: 400px;
-  align-self: start;
-
 }
 
 .cart-item-info h3 {

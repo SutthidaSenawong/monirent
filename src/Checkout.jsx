@@ -26,7 +26,10 @@ export default function Checkout() {
     name: '',
     email: '',
     whatsapp: '',
-    address: ''
+    address: '',
+    hotelName: '',
+    roomNumber: '',
+    locationConfirmed: false
   });
   
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -53,7 +56,8 @@ export default function Checkout() {
   // Calculate totals
   const weeklySubtotal = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const dailyRate = selectedItems.reduce((sum, item) => sum + (calculateDailyPrice(item.price) * item.quantity), 0);
-  const totalPrice = dailyRate * rentalDays;
+  const deliveryFee = 200;
+  const totalPrice = (dailyRate * rentalDays) + deliveryFee;
 
   // Redirect if cart is empty
   if (selectedItems.length === 0) {
@@ -76,10 +80,10 @@ export default function Checkout() {
   }
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -104,10 +108,20 @@ export default function Checkout() {
   };
 
   const validateDeliveryInfo = () => {
-    if (!formData.rentalPeriod || !formData.name || !formData.email || !formData.whatsapp || !formData.address) {
+    if (!formData.rentalPeriod || !formData.name || !formData.email || !formData.whatsapp || !formData.address || !formData.hotelName) {
       alert('Please fill in all required delivery information');
       return false;
     }
+
+    if (!formData.locationConfirmed) {
+      alert('Please confirm your delivery location is within Chiang Mai City');
+      const checkboxElement = document.getElementById('location-confirm-container');
+      if (checkboxElement) {
+        checkboxElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return false;
+    }
+
     return true;
   };
 
@@ -224,6 +238,50 @@ export default function Checkout() {
               rows="3"
             />
           </div>
+
+          <div className="form-group">
+            <label htmlFor="hotelName">
+              Hotel / Accommodation Name <span className="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="hotelName"
+              name="hotelName"
+              value={formData.hotelName}
+              onChange={handleInputChange}
+              required
+              className="form-input"
+              placeholder="Enter hotel or accommodation name"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="roomNumber">
+              Room Number (optional)
+            </label>
+            <input
+              type="text"
+              id="roomNumber"
+              name="roomNumber"
+              value={formData.roomNumber}
+              onChange={handleInputChange}
+              className="form-input"
+              placeholder="Enter room number if available"
+            />
+          </div>
+
+          <div className="form-group checkbox-group" id="location-confirm-container">
+            <label className="checkbox-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                name="locationConfirmed"
+                checked={formData.locationConfirmed}
+                onChange={handleInputChange}
+                style={{ marginTop: '4px' }}
+              />
+              <span>I confirm the delivery location is within Chiang Mai City. <span className="required">*</span></span>
+            </label>
+          </div>
         </div>
 
         {/* Order Summary Card */}
@@ -268,6 +326,10 @@ export default function Checkout() {
             <div className="summary-row">
               <span>Rental Days:</span>
               <span>{rentalDays} {rentalDays === 1 ? 'day' : 'days'}</span>
+            </div>
+            <div className="summary-row">
+              <span>Delivery Fee:</span>
+              <span>{formatPrice(deliveryFee)} THB</span>
             </div>
             <div className="summary-row total">
               <span>Total:</span>
