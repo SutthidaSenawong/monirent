@@ -1,12 +1,13 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { HiArrowNarrowLeft } from 'react-icons/hi';
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import useCart from './hooks/cart';
-import StripePaymentForm from './Component/StripePaymentForm';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { HiArrowNarrowLeft } from "react-icons/hi";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import useCart from "./hooks/cart";
+import StripePaymentForm from "./Component/StripePaymentForm";
+import { savePurchaseInfo } from "../api";
 
 // Initialize Stripe with publishable key from environment variable
 // In Vite, environment variables must be prefixed with VITE_
@@ -15,27 +16,31 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 export default function Checkout() {
   const { selectedItems } = useCart();
   const navigate = useNavigate();
-  
+
   const formatPrice = (price) => {
-    return price.toLocaleString('en-US');
+    return price.toLocaleString("en-US");
   };
-  
+
   // Form state
   const [formData, setFormData] = useState({
     rentalPeriod: null, // Will be [startDate, endDate]
-    name: '',
-    email: '',
-    whatsapp: '',
-    address: '',
-    hotelName: '',
-    roomNumber: '',
-    locationConfirmed: false
+    name: "",
+    email: "",
+    whatsapp: "",
+    address: "",
+    hotelName: "",
+    roomNumber: "",
+    locationConfirmed: false,
   });
-  
+
+  const [errors, setErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const totalItems = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = selectedItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
 
   // Calculate rental days from selected date range
   const calculateRentalDays = () => {
@@ -52,26 +57,32 @@ export default function Checkout() {
   };
 
   const rentalDays = calculateRentalDays();
-  
+
   // Calculate totals
-  const weeklySubtotal = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const dailyRate = selectedItems.reduce((sum, item) => sum + (calculateDailyPrice(item.price) * item.quantity), 0);
+  const weeklySubtotal = selectedItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const dailyRate = selectedItems.reduce(
+    (sum, item) => sum + calculateDailyPrice(item.price) * item.quantity,
+    0
+  );
   const deliveryFee = 200;
-  const totalPrice = (dailyRate * rentalDays) + deliveryFee;
+  const totalPrice = dailyRate * rentalDays + deliveryFee;
 
   // Redirect if cart is empty
   if (selectedItems.length === 0) {
     return (
       <div>
-        <Link to="/rent-monitors-chiangmai" relative="path">
-          <p className="back-btn">
+        <Link to='/rent-monitors-chiangmai' relative='path'>
+          <p className='back-btn'>
             <HiArrowNarrowLeft /> Back to all monitors
           </p>
         </Link>
-        <div className="empty-cart">
+        <div className='empty-cart'>
           <h2>Your cart is empty</h2>
           <p>Add some monitors to checkout!</p>
-          <Link to="/rent-monitors-chiangmai" className="rent-btn">
+          <Link to='/rent-monitors-chiangmai' className='rent-btn'>
             Browse Monitors
           </Link>
         </div>
@@ -81,43 +92,82 @@ export default function Checkout() {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
   };
 
   const handleDateChange = (value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      rentalPeriod: value
+      rentalPeriod: value,
     }));
+    if (errors.rentalPeriod) {
+      setErrors((prev) => ({ ...prev, rentalPeriod: null }));
+    }
   };
 
   const formatDateRange = (dateRange) => {
-    if (!dateRange) return '';
+    if (!dateRange) return "";
     const [start, end] = dateRange;
     const formatDate = (date) => {
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric', 
-        year: 'numeric' 
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
       });
     };
     return `${formatDate(start)} - ${formatDate(end)}`;
   };
 
   const validateDeliveryInfo = () => {
-    if (!formData.rentalPeriod || !formData.name || !formData.email || !formData.whatsapp || !formData.address || !formData.hotelName) {
-      alert('Please fill in all required delivery information');
-      return false;
+    const newErrors = {};
+    let firstErrorId = null;
+
+    if (!formData.rentalPeriod) {
+      newErrors.rentalPeriod = "Rental period is required";
+      if (!firstErrorId) firstErrorId = "rental-calendar-container";
+    }
+    if (!formData.name) {
+      newErrors.name = "Full Name is required";
+      if (!firstErrorId) firstErrorId = "name";
+    }
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+      if (!firstErrorId) firstErrorId = "email";
+    }
+    if (!formData.whatsapp) {
+      newErrors.whatsapp = "WhatsApp Number is required";
+      if (!firstErrorId) firstErrorId = "whatsapp";
+    }
+    if (!formData.address) {
+      newErrors.address = "Delivery Address is required";
+      if (!firstErrorId) firstErrorId = "address";
+    }
+    if (!formData.hotelName) {
+      newErrors.hotelName = "Hotel Name is required";
+      if (!firstErrorId) firstErrorId = "hotelName";
+    }
+    if (!formData.locationConfirmed) {
+      newErrors.locationConfirmed = "Please confirm your delivery location";
+      if (!firstErrorId) firstErrorId = "location-confirm-container";
     }
 
-    if (!formData.locationConfirmed) {
-      alert('Please confirm your delivery location is within Chiang Mai City');
-      const checkboxElement = document.getElementById('location-confirm-container');
-      if (checkboxElement) {
-        checkboxElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      if (firstErrorId) {
+        const element = document.getElementById(firstErrorId);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+          if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
+            element.focus();
+          }
+        }
       }
       return false;
     }
@@ -125,8 +175,47 @@ export default function Checkout() {
     return true;
   };
 
-  const handlePaymentSuccess = () => {
-    setShowSuccessModal(true);
+  const handlePaymentSuccess = async () => {
+    setIsProcessing(true);
+    try {
+      const purchaseOrder = {
+        id: Date.now(),
+        rentalPeriodFrom: formData.rentalPeriod[0].toISOString(),
+        rentalPeriodTo: formData.rentalPeriod[1].toISOString(),
+        fullName: formData.name,
+        email: formData.email,
+        whatsappNumber: formData.whatsapp,
+        deliveryAddress: formData.address,
+        hotelOrAccommodationName: formData.hotelName,
+        roomNumber: formData.roomNumber,
+        rentItems: selectedItems.map((item) => ({
+          monitorId: Number(item.id),
+          quantity: item.quantity,
+        })),
+        dailyRentRate: dailyRate,
+        weeklyRentRate: weeklySubtotal,
+        totalFee: totalPrice,
+        status: "WAITING_FOR_DELIVERY",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        logs: [
+          {
+            timestamp: new Date().toISOString(),
+            message: "customer purchase the order",
+          },
+        ],
+      };
+
+      await savePurchaseInfo(purchaseOrder);
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Error saving purchase info:", error);
+      alert(
+        "Payment successful but failed to save order details. Please contact support."
+      );
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handlePaymentError = (errorMessage) => {
@@ -136,217 +225,279 @@ export default function Checkout() {
   const handleCloseModal = () => {
     setShowSuccessModal(false);
     // Redirect to home or monitors page
-    navigate('/rent-monitors-chiangmai');
+    navigate("/rent-monitors-chiangmai");
   };
 
   return (
-    <div className="checkout-page">
-      <Link to="/rent-monitors-chiangmai/cart" relative="path">
-        <p className="back-btn">
+    <div className='checkout-page'>
+      <Link to='/rent-monitors-chiangmai/cart' relative='path'>
+        <p className='back-btn'>
           <HiArrowNarrowLeft /> Back to cart
         </p>
       </Link>
-      
+
       <h2>Checkout</h2>
 
       {/* Delivery Information Card */}
-      <div className="checkout-form-section">
-        <div className="checkout-card">
+      <div className='checkout-form-section'>
+        <div className='checkout-card'>
           <h3>Delivery Information</h3>
-          
-          <div className="form-group">
-            <label htmlFor="rentalPeriod">
-              Rental Period <span className="required">*</span>
+
+          <div className='form-group'>
+            <label htmlFor='rentalPeriod'>
+              Rental Period <span className='required'>*</span>
             </label>
             {formData.rentalPeriod && (
-              <div className="selected-date-range">
+              <div className='selected-date-range'>
                 {formatDateRange(formData.rentalPeriod)}
               </div>
             )}
-            <div className="calendar-wrapper">
+            <div className='calendar-wrapper' id='rental-calendar-container'>
               <Calendar
                 onChange={handleDateChange}
                 value={formData.rentalPeriod}
                 selectRange={true}
                 minDate={new Date()}
-                className="rental-calendar"
+                className='rental-calendar'
               />
             </div>
-            <small className="form-hint">Select start and end dates for your rental period</small>
+            {errors.rentalPeriod && (
+              <span style={{ color: "red", fontSize: "0.875rem" }}>
+                {errors.rentalPeriod}
+              </span>
+            )}
+            <small className='form-hint'>
+              Select start and end dates for your rental period
+            </small>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="name">
-              Full Name <span className="required">*</span>
+          <div className='form-group'>
+            <label htmlFor='name'>
+              Full Name <span className='required'>*</span>
             </label>
             <input
-              type="text"
-              id="name"
-              name="name"
+              type='text'
+              id='name'
+              name='name'
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="form-input"
-              placeholder="Enter your full name"
+              className='form-input'
+              style={errors.name ? { borderColor: "red" } : {}}
+              placeholder='Enter your full name'
             />
+            {errors.name && (
+              <span style={{ color: "red", fontSize: "0.875rem" }}>
+                {errors.name}
+              </span>
+            )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="email">
-              Email <span className="required">*</span>
+          <div className='form-group'>
+            <label htmlFor='email'>
+              Email <span className='required'>*</span>
             </label>
             <input
-              type="email"
-              id="email"
-              name="email"
+              type='email'
+              id='email'
+              name='email'
               value={formData.email}
               onChange={handleInputChange}
               required
-              className="form-input"
-              placeholder="your.email@example.com"
+              className='form-input'
+              style={errors.email ? { borderColor: "red" } : {}}
+              placeholder='your.email@example.com'
             />
+            {errors.email && (
+              <span style={{ color: "red", fontSize: "0.875rem" }}>
+                {errors.email}
+              </span>
+            )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="whatsapp">
-              WhatsApp Number <span className="required">*</span>
+          <div className='form-group'>
+            <label htmlFor='whatsapp'>
+              WhatsApp Number <span className='required'>*</span>
             </label>
             <input
-              type="tel"
-              id="whatsapp"
-              name="whatsapp"
+              type='tel'
+              id='whatsapp'
+              name='whatsapp'
               value={formData.whatsapp}
               onChange={handleInputChange}
               required
-              className="form-input"
-              placeholder="+66 XX XXX XXXX"
+              className='form-input'
+              style={errors.whatsapp ? { borderColor: "red" } : {}}
+              placeholder='+66 XX XXX XXXX'
             />
+            {errors.whatsapp && (
+              <span style={{ color: "red", fontSize: "0.875rem" }}>
+                {errors.whatsapp}
+              </span>
+            )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="address">
-              {`Delivery Address (or Google Maps Link)`} <span className="required">*</span>
+          <div className='form-group'>
+            <label htmlFor='address'>
+              {`Delivery Address (or Google Maps Link)`}{" "}
+              <span className='required'>*</span>
             </label>
             <textarea
-              id="address"
-              name="address"
+              id='address'
+              name='address'
               value={formData.address}
               onChange={handleInputChange}
               required
-              className="form-input form-textarea"
-              placeholder="Enter your full delivery address"
-              rows="3"
+              className='form-input form-textarea'
+              style={errors.address ? { borderColor: "red" } : {}}
+              placeholder='Enter your full delivery address'
+              rows='3'
             />
+            {errors.address && (
+              <span style={{ color: "red", fontSize: "0.875rem" }}>
+                {errors.address}
+              </span>
+            )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="hotelName">
-              Hotel / Accommodation Name <span className="required">*</span>
+          <div className='form-group'>
+            <label htmlFor='hotelName'>
+              Hotel / Accommodation Name <span className='required'>*</span>
             </label>
             <input
-              type="text"
-              id="hotelName"
-              name="hotelName"
+              type='text'
+              id='hotelName'
+              name='hotelName'
               value={formData.hotelName}
               onChange={handleInputChange}
               required
-              className="form-input"
-              placeholder="Enter hotel or accommodation name"
+              className='form-input'
+              style={errors.hotelName ? { borderColor: "red" } : {}}
+              placeholder='Enter hotel or accommodation name'
             />
+            {errors.hotelName && (
+              <span style={{ color: "red", fontSize: "0.875rem" }}>
+                {errors.hotelName}
+              </span>
+            )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="roomNumber">
-              Room Number (optional)
-            </label>
+          <div className='form-group'>
+            <label htmlFor='roomNumber'>Room Number (optional)</label>
             <input
-              type="text"
-              id="roomNumber"
-              name="roomNumber"
+              type='text'
+              id='roomNumber'
+              name='roomNumber'
               value={formData.roomNumber}
               onChange={handleInputChange}
-              className="form-input"
-              placeholder="Enter room number if available"
+              className='form-input'
+              placeholder='Enter room number if available'
             />
           </div>
 
-          <div className="form-group checkbox-group" id="location-confirm-container">
-            <label className="checkbox-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+          <div
+            className='form-group checkbox-group'
+            id='location-confirm-container'
+          >
+            <label
+              className='checkbox-label'
+              style={{
+                display: "flex",
+                gap: "10px",
+                cursor: "pointer",
+              }}
+            >
               <input
-                type="checkbox"
-                name="locationConfirmed"
+                type='checkbox'
+                name='locationConfirmed'
                 checked={formData.locationConfirmed}
                 onChange={handleInputChange}
-                style={{ marginTop: '4px' }}
+                style={{ marginTop: "4px" }}
               />
-              <span>I confirm the delivery location is within Chiang Mai City. <span className="required">*</span></span>
+              <span>
+                I confirm the delivery location is within Chiang Mai City.{" "}
+                <span className='required'>*</span>
+              </span>
             </label>
           </div>
         </div>
 
         {/* Order Summary Card */}
-        <div className="checkout-card">
-          <h3>Order Summary ({totalItems} {totalItems === 1 ? 'item' : 'items'})</h3>
+        <div className='checkout-card'>
+          <h3>
+            Order Summary ({totalItems} {totalItems === 1 ? "item" : "items"})
+          </h3>
           {rentalDays > 0 && (
-            <div className="rental-period-info">
-              📅 Rental Period: {rentalDays} {rentalDays === 1 ? 'day' : 'days'}
+            <div className='rental-period-info'>
+              📅 Rental Period: {rentalDays} {rentalDays === 1 ? "day" : "days"}
             </div>
           )}
-          
-          <div className="checkout-items-list">
+
+          <div className='checkout-items-list'>
             {selectedItems.map((item) => (
-              <div key={item.id} className="checkout-item">
+              <div key={item.id} className='checkout-item'>
                 <img
                   src={item.imageUrl}
                   alt={item.name}
-                  className="checkout-item-img"
+                  className='checkout-item-img'
                 />
-                <div className="checkout-item-details">
+                <div className='checkout-item-details'>
                   <h4>{item.name}</h4>
-                  <p className="checkout-item-price">
-                    {formatPrice(item.price)} THB/week ({formatPrice(calculateDailyPrice(item.price))} THB/day) × {item.quantity}
+                  <p className='checkout-item-price'>
+                    {formatPrice(item.price)} THB/week (
+                    {formatPrice(calculateDailyPrice(item.price))} THB/day) ×{" "}
+                    {item.quantity}
                   </p>
                 </div>
-                <div className="checkout-item-total">
-                  {formatPrice(calculateDailyPrice(item.price) * item.quantity * rentalDays)} THB
+                <div className='checkout-item-total'>
+                  {formatPrice(
+                    calculateDailyPrice(item.price) * item.quantity * rentalDays
+                  )}{" "}
+                  THB
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="checkout-summary-totals">
-            <div className="summary-row">
+          <div className='checkout-summary-totals'>
+            <div className='summary-row'>
               <span>Weekly Rate:</span>
               <span>{formatPrice(weeklySubtotal)} THB/week</span>
             </div>
-            <div className="summary-row">
+            <div className='summary-row'>
               <span>Daily Rate:</span>
               <span>{formatPrice(dailyRate)} THB/day</span>
             </div>
-            <div className="summary-row">
+            <div className='summary-row'>
               <span>Rental Days:</span>
-              <span>{rentalDays} {rentalDays === 1 ? 'day' : 'days'}</span>
+              <span>
+                {rentalDays} {rentalDays === 1 ? "day" : "days"}
+              </span>
             </div>
-            <div className="summary-row">
+            <div className='summary-row'>
               <span>Delivery Fee:</span>
               <span>{formatPrice(deliveryFee)} THB</span>
             </div>
-            <div className="summary-row total">
+            <div className='summary-row total'>
               <span>Total:</span>
-              <span><strong>{formatPrice(totalPrice)} THB</strong></span>
+              <span>
+                <strong>{formatPrice(totalPrice)} THB</strong>
+              </span>
             </div>
           </div>
         </div>
-
       </div>
 
       {/* Payment Card with Stripe */}
-      <div className="checkout-card">
+      <div className='checkout-card'>
         <h3>Payment Information</h3>
-        
-        <div className="payment-info-message">
+
+        <div className='payment-info-message'>
           <p>💳 Secure payment powered by Stripe</p>
-          <p>Test mode: Use card number 4242 4242 4242 4242 with any future date and CVC</p>
+          <p>
+            Test mode: Use card number 4242 4242 4242 4242 with any future date
+            and CVC
+          </p>
         </div>
 
         <Elements stripe={stripePromise}>
@@ -363,13 +514,18 @@ export default function Checkout() {
 
       {/* Success Modal */}
       {showSuccessModal && (
-        <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-icon">✓</div>
+        <div className='modal-overlay' onClick={handleCloseModal}>
+          <div className='modal-content' onClick={(e) => e.stopPropagation()}>
+            <div className='modal-icon'>✓</div>
             <h2>Thank you for your order!</h2>
-            <p>We will message you on WhatsApp at <strong>{formData.whatsapp}</strong></p>
-            <p className="modal-subtext">You will receive a confirmation email at {formData.email}</p>
-            <button onClick={handleCloseModal} className="rent-btn modal-btn">
+            <p>
+              We will message you on WhatsApp at{" "}
+              <strong>{formData.whatsapp}</strong>
+            </p>
+            <p className='modal-subtext'>
+              You will receive a confirmation email at {formData.email}
+            </p>
+            <button onClick={handleCloseModal} className='rent-btn modal-btn'>
               Continue Shopping
             </button>
           </div>

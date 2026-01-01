@@ -37,10 +37,6 @@ export default function StripePaymentForm({ amount, onSuccess, onError, isProces
         return;
       }
 
-      // In production, you would send paymentMethod.id to your backend
-      // to create a payment intent and confirm the payment
-      console.log('Payment Method Created:', paymentMethod);
-
       // Simulate successful payment for demo
       setTimeout(() => {
         setIsProcessing(false);

@@ -641,6 +641,8 @@ span {
   width: 100%;
   padding: 12px 16px;
   border: 1px solid #e5e7eb;
+  background-color: #fff;
+  color: black;
   border-radius: 8px;
   font-size: 1rem;
   font-family: inherit;

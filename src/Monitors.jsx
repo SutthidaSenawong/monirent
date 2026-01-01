@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getMonitors } from '../api';
+import { getItems } from '../api';
 import { IoMdAdd } from 'react-icons/io';
 import useCart from './hooks/cart';
 
@@ -16,7 +16,7 @@ export default function Monitors() {
     async function loadMonitors() {
       setLoading(true);
       try {
-        const data = await getMonitors();
+        const data = await getItems();
         setMonitors(data);
         // console.log(monitors.imageUrl);
       } catch (err) {
