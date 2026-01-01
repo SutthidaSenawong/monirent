@@ -1,8 +1,7 @@
-import React from 'react';
-import Logo from '../assets/MoniRent-logo.png';
+import Logo from "../assets/MoniRent-logo.png";
 import { LuShoppingCart } from "react-icons/lu";
-import { Link } from 'react-router-dom';
-import useCart from '../hooks/cart';
+import { Link } from "react-router-dom";
+import useCart from "../hooks/cart";
 
 export default function Header() {
   const { selectedItems } = useCart();

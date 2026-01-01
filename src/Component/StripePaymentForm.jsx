@@ -1,7 +1,15 @@
-import { useState } from 'react';
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+/* eslint-disable react/prop-types */
+import { useState } from "react";
+import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
-export default function StripePaymentForm({ amount, onSuccess, onError, isProcessing, setIsProcessing, validateDeliveryInfo }) {
+export default function StripePaymentForm({
+  amount,
+  onSuccess,
+  onError,
+  isProcessing,
+  setIsProcessing,
+  validateDeliveryInfo,
+}) {
   const stripe = useStripe();
   const elements = useElements();
   const [cardError, setCardError] = useState(null);
@@ -25,8 +33,8 @@ export default function StripePaymentForm({ amount, onSuccess, onError, isProces
 
     try {
       // Create payment method
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
-        type: 'card',
+      const { error } = await stripe.createPaymentMethod({
+        type: "card",
         card: cardElement,
       });
 
@@ -42,7 +50,6 @@ export default function StripePaymentForm({ amount, onSuccess, onError, isProces
         setIsProcessing(false);
         onSuccess();
       }, 1500);
-
     } catch (error) {
       setCardError(error.message);
       setIsProcessing(false);
@@ -53,40 +60,40 @@ export default function StripePaymentForm({ amount, onSuccess, onError, isProces
   const cardElementOptions = {
     style: {
       base: {
-        fontSize: '16px',
-        color: '#213547',
-        '::placeholder': {
-          color: '#5d5d5f',
+        fontSize: "16px",
+        color: "#213547",
+        "::placeholder": {
+          color: "#5d5d5f",
         },
-        fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontFamily: "Inter, system-ui, Avenir, Helvetica, Arial, sans-serif",
       },
       invalid: {
-        color: '#ff3b30',
+        color: "#ff3b30",
       },
     },
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="form-group">
+      <div className='form-group'>
         <label>
-          Card Details <span className="required">*</span>
+          Card Details <span className='required'>*</span>
         </label>
-        <div className="stripe-card-element">
+        <div className='stripe-card-element'>
           <CardElement options={cardElementOptions} />
         </div>
-        {cardError && <div className="card-error">{cardError}</div>}
-        <small className="form-hint">
+        {cardError && <div className='card-error'>{cardError}</div>}
+        <small className='form-hint'>
           Test card: 4242 4242 4242 4242, any future date, any CVC
         </small>
       </div>
 
-      <button 
-        type="submit" 
-        className="rent-btn checkout-submit-btn"
+      <button
+        type='submit'
+        className='rent-btn checkout-submit-btn'
         disabled={!stripe || isProcessing}
       >
-        {isProcessing ? 'Processing...' : `Complete Order - ${amount} THB/week`}
+        {isProcessing ? "Processing..." : `Complete Order - ${amount} THB/week`}
       </button>
     </form>
   );

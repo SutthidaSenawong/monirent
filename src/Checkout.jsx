@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { HiArrowNarrowLeft } from "react-icons/hi";
+import { HiArrowNarrowLeft, HiClipboardCopy, HiCheck } from "react-icons/hi";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import Calendar from "react-calendar";
@@ -36,6 +36,8 @@ export default function Checkout() {
   const [errors, setErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   const totalItems = selectedItems.reduce(
     (sum, item) => sum + item.quantity,
@@ -178,8 +180,9 @@ export default function Checkout() {
   const handlePaymentSuccess = async () => {
     setIsProcessing(true);
     try {
+      const newOrderId = crypto.randomUUID();
       const purchaseOrder = {
-        id: Date.now(),
+        id: newOrderId,
         rentalPeriodFrom: formData.rentalPeriod[0].toISOString(),
         rentalPeriodTo: formData.rentalPeriod[1].toISOString(),
         fullName: formData.name,
@@ -207,6 +210,7 @@ export default function Checkout() {
       };
 
       await savePurchaseInfo(purchaseOrder);
+      setOrderId(newOrderId);
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error saving purchase info:", error);
@@ -518,6 +522,71 @@ export default function Checkout() {
           <div className='modal-content' onClick={(e) => e.stopPropagation()}>
             <div className='modal-icon'>✓</div>
             <h2>Thank you for your order!</h2>
+            {orderId && (
+              <div
+                className='order-id-container'
+                style={{
+                  margin: "1rem 0",
+                  padding: "0.75rem",
+                  backgroundColor: "#f3f4f6",
+                  borderRadius: "0.5rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "0.875rem",
+                    color: "#6b7280",
+                    fontWeight: "500",
+                  }}
+                >
+                  Order ID
+                </span>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    background: "white",
+                    padding: "0.25rem 0.5rem",
+                    borderRadius: "0.25rem",
+                    border: "1px solid #e5e7eb",
+                  }}
+                >
+                  <code
+                    style={{
+                      fontFamily: "monospace",
+                      fontSize: "1rem",
+                      color: "#374151",
+                    }}
+                  >
+                    {orderId}
+                  </code>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(orderId);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: copied ? "#10b981" : "#6b7280",
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "0.25rem",
+                    }}
+                    title='Copy Order ID'
+                  >
+                    {copied ? <HiCheck size={20} /> : <HiClipboardCopy size={20} />}
+                  </button>
+                </div>
+              </div>
+            )}
             <p>
               We will message you on WhatsApp at{" "}
               <strong>{formData.whatsapp}</strong>

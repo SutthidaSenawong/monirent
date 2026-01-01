@@ -5,7 +5,7 @@ import {
   doc,
   getDocs,
   getDoc,
-  addDoc,
+  setDoc,
 } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -59,7 +59,7 @@ export async function getItem(id) {
 
 /**
  * @typedef {Object} PurchaseOrder
- * @property {number} id - primary key
+ * @property {string} id - primary key (UUID)
  * @property {string} rentalPeriodFrom - ISO date string
  * @property {string} rentalPeriodTo - ISO date string
  * @property {string} fullName
@@ -83,10 +83,11 @@ export async function getItem(id) {
  * @param {PurchaseInfo} purchaseOrder
  */
 export async function savePurchaseInfo(purchaseOrder) {
-  const ordersCollectionRef = collection(db, "purchaseOrders");
+  // const ordersCollectionRef = collection(db, "purchaseOrders");
   try {
-    const docRef = await addDoc(ordersCollectionRef, purchaseOrder);
-    return docRef.id;
+    // Use the provided ID as the document key
+    await setDoc(doc(db, "purchaseOrders", String(purchaseOrder.id)), purchaseOrder);
+    return purchaseOrder.id;
   } catch (e) {
     console.error("Error adding document: ", e);
     throw e;

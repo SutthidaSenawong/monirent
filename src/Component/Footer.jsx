@@ -1,23 +1,22 @@
-import React from 'react';
-import { FaFacebookSquare } from 'react-icons/fa';
-import { BsInstagram } from 'react-icons/bs';
+import { FaFacebookSquare } from "react-icons/fa";
+import { BsInstagram } from "react-icons/bs";
 
 export default function Footer() {
   return (
-    <div className="footer">
+    <div className='footer'>
       <a
-        href="https://www.facebook.com/rent.monitor.chinagmai.monirent"
-        target="_blank"
-        rel="noopener noreferrer"
+        href='https://www.facebook.com/rent.monitor.chinagmai.monirent'
+        target='_blank'
+        rel='noopener noreferrer'
       >
-        <FaFacebookSquare className="social-icon" />
+        <FaFacebookSquare className='social-icon' />
       </a>
       <a
-        href="https://www.instagram.com/monirent_cnx/"
-        target="_blank"
-        rel="noopener noreferrer"
+        href='https://www.instagram.com/monirent_cnx/'
+        target='_blank'
+        rel='noopener noreferrer'
       >
-        <BsInstagram className="social-icon" />
+        <BsInstagram className='social-icon' />
       </a>
     </div>
   );
