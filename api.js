@@ -6,6 +6,14 @@ import {
   getDocs,
   getDoc,
   setDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+  startAfter,
+  getCountFromServer,
+  updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -91,5 +99,108 @@ export async function savePurchaseInfo(purchaseOrder) {
   } catch (e) {
     console.error("Error adding document: ", e);
     throw e;
+  }
+}
+
+// param:
+// id (optional)
+// date from (required)
+// date to (required)
+// status (optional)
+// pagination offset, limit
+export async function getPurchaseOrders({
+  id,
+  dateFrom,
+  dateTo,
+  status,
+  lastDoc,
+  pageSize = 25,
+}) {
+  const ordersCollectionRef = collection(db, "purchaseOrders");
+  const constraints = [];
+
+  if (id) {
+    // If ID is provided, we can just fetch that specific document or filter by it.
+    // Since ID is unique, filtering by it returns 0 or 1 result.
+    // However, user said "first 6 char" in display, but "id (text, optional)" in input.
+    // If they type full ID, we search. If partial, Firestore doesn't support native partial search well.
+    // Let's assume exact ID for now or maybe >= ID and <= ID + '\uf8ff' for prefix?
+    // But we can't combine range on ID with range on rentalPeriodFrom.
+    // So if ID is present, we might prioritize it or just use equality.
+    // Let's try equality first.
+    constraints.push(where("id", "==", id));
+  } else {
+    // Only apply other filters if ID is not present (or we can try to combine if Firestore allows, but usually range on multiple fields is no-go)
+    // Actually, if ID is present, we probably don't need date range?
+    // But the requirement says "calendar ... (require)".
+    // Let's stick to the requirements.
+    // If ID is provided, we might ignore date range if we want to find a specific order.
+    // But if the user wants to filter within date range...
+    // Let's assume if ID is provided, we search by ID.
+    // If not, we use date range.
+    
+    if (status) {
+      constraints.push(where("status", "==", status));
+    }
+
+    if (dateFrom) {
+      constraints.push(where("rentalPeriodFrom", ">=", dateFrom));
+    }
+    if (dateTo) {
+      constraints.push(where("rentalPeriodFrom", "<=", dateTo));
+    }
+    
+    // Order by rentalPeriodFrom for the range filter
+    constraints.push(orderBy("rentalPeriodFrom", "desc"));
+  }
+
+  // Create a separate query for counting before adding pagination limits
+  const countQ = query(ordersCollectionRef, ...constraints);
+  let totalCount = 0;
+  try {
+    const countSnapshot = await getCountFromServer(countQ);
+    totalCount = countSnapshot.data().count;
+  } catch (err) {
+    console.error("Error getting count:", err);
+  }
+
+  constraints.push(limit(pageSize));
+
+  if (lastDoc) {
+    constraints.push(startAfter(lastDoc));
+  }
+
+  const q = query(ordersCollectionRef, ...constraints);
+  const snapshot = await getDocs(q);
+  
+  const orders = snapshot.docs.map((doc) => ({
+    ...doc.data(),
+    // id is already in data, but good to ensure
+  }));
+
+  return {
+    orders,
+    lastDoc: snapshot.docs[snapshot.docs.length - 1],
+    totalCount,
+  };
+}
+
+export async function updatePurchaseOrderStatus(id, newStatus, oldStatus) {
+  const orderRef = doc(db, "purchaseOrders", id);
+  const timestamp = new Date().toISOString();
+  
+  try {
+      await updateDoc(orderRef, {
+          status: newStatus,
+          updatedAt: timestamp,
+          logs: arrayUnion({
+              timestamp: timestamp,
+              message: `update status from ${oldStatus} to ${newStatus}`
+          })
+      });
+      return true;
+  } catch (e) {
+      console.error("Error updating status: ", e);
+      throw e;
   }
 }

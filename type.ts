@@ -1,4 +1,4 @@
-type PurchaseInfo = {
+type PurchaseOrder = {
   id: number; // primary key
 
   // purchase details
