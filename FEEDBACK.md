@@ -26,4 +26,5 @@ WhatsApp Number (เบอร์โทร) *
 
 - order page
   - show every order
+  - send email notify when have new order
   - show today order to delivery and pickup

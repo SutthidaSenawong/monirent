@@ -141,9 +141,16 @@ export default function Checkout() {
     if (!formData.email) {
       newErrors.email = "Email is required";
       if (!firstErrorId) firstErrorId = "email";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+      if (!firstErrorId) firstErrorId = "email";
     }
+
     if (!formData.whatsapp) {
       newErrors.whatsapp = "WhatsApp Number is required";
+      if (!firstErrorId) firstErrorId = "whatsapp";
+    } else if (!/^[\d\s+()-]+$/.test(formData.whatsapp)) {
+      newErrors.whatsapp = "Please enter a valid phone number";
       if (!firstErrorId) firstErrorId = "whatsapp";
     }
     if (!formData.address) {
