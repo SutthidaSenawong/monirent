@@ -1,10 +1,10 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { getItems } from '../api';
-import { IoMdAdd } from 'react-icons/io';
-import useCart from './hooks/cart';
+import React from "react";
+import { Link } from "react-router-dom";
+import { IoMdAdd } from "react-icons/io";
+import useCart from "./lib/cart";
 
-import Slide from './Slide';
+import Slide from "./Slide";
+import { getItems } from "./lib/api";
 
 export default function Monitors() {
   const [monitors, setMonitors] = React.useState([]);
@@ -35,25 +35,27 @@ export default function Monitors() {
   };
 
   const monitorsElements = monitors.map((monitor) => {
-    const cartItem = selectedItems.find(item => item.id === monitor.id);
+    const cartItem = selectedItems.find((item) => item.id === monitor.id);
     const quantity = cartItem?.quantity || 0;
-    
+
     return (
       <div key={monitor.id}>
         <Link to={`/rent-monitors-chiangmai/${monitor.id}`}>
-          <div className="monitor-container">
+          <div className='monitor-container'>
             <button
               onClick={(e) => handleAddToCart(e, monitor)}
-              className="add-to-cart-btn"
+              className='add-to-cart-btn'
               aria-label={`Add ${monitor.name} to cart`}
             >
               <IoMdAdd size={20} />
             </button>
-            {quantity > 0 && <span className="cart-quantity-badge">{quantity}</span>}
+            {quantity > 0 && (
+              <span className='cart-quantity-badge'>{quantity}</span>
+            )}
             <img
               src={`${monitor.imageUrl}`}
               alt={monitor.name}
-              className="monitor-img"
+              className='monitor-img'
             />
 
             <div>
@@ -79,7 +81,7 @@ export default function Monitors() {
     <>
       <Slide />
       <h2>Monitors For Rent in Chiang Mai </h2>
-      <div className="all-monitors">{monitorsElements}</div>
+      <div className='all-monitors'>{monitorsElements}</div>
     </>
   );
 }

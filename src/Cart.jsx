@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { HiArrowNarrowLeft } from 'react-icons/hi';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { IoMdAdd, IoMdRemove } from 'react-icons/io';
-import useCart from './hooks/cart';
+import useCart from './lib/cart';
 
 export default function Cart() {
   const { selectedItems, removeItem, updateQuantity } = useCart();

@@ -5,10 +5,9 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import useCart from "./hooks/cart";
+import useCart from "./lib/cart";
 import StripePaymentForm from "./Component/StripePaymentForm";
-import { savePurchaseInfo } from "../api";
-
+import { savePurchaseInfo } from "./lib/api";
 // Initialize Stripe with publishable key from environment variable
 // In Vite, environment variables must be prefixed with VITE_
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
@@ -219,6 +218,7 @@ export default function Checkout() {
       };
 
       await savePurchaseInfo(purchaseOrder);
+
       setOrderId(newOrderId);
       setShowSuccessModal(true);
     } catch (error) {
@@ -604,10 +604,13 @@ export default function Checkout() {
               We will message you on WhatsApp at{" "}
               <strong>{formData.whatsapp}</strong>
             </p>
+<<<<<<< HEAD
             git rebase --abort
             <p className='modal-subtext'>
               You will receive a confirmation email at {formData.email}
             </p>
+=======
+>>>>>>> 4401a15 (refactor: add lib/)
             <button onClick={handleCloseModal} className='rent-btn modal-btn'>
               Continue Shopping
             </button>

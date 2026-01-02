@@ -3,8 +3,9 @@ import { useParams, Link } from "react-router-dom";
 import { HiArrowNarrowLeft } from "react-icons/hi";
 import { LuShoppingCart } from "react-icons/lu";
 import { RiMessengerLine } from "react-icons/ri";
-import { getItem } from "../api";
-import useCart from "./hooks/cart";
+
+import useCart from "./lib/cart";
+import { getItem } from "./lib/api";
 
 export default function MonitorsDetail() {
   const [monitor, setMonitor] = React.useState(null);
