@@ -76,7 +76,7 @@ export async function getItem(id) {
  * @property {string} deliveryAddress
  * @property {string} hotelOrAccommodationName
  * @property {string} [roomNumber]
- * @property {Array<{monitorId: number, quantity: number}>} rentItems
+ * @property {Array<{id: number, name: string, imageUrl: string, quantity: number}>} rentItems
  * @property {number} dailyRentRate
  * @property {number} weeklyRentRate
  * @property {number} totalFee

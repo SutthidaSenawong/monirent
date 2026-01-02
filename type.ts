@@ -11,7 +11,9 @@ type PurchaseOrder = {
   hotelOrAccommodationName: string;
   roomNumber?: string;
   rentItems: Array<{
-    monitorId: number;
+    id: number;
+    name: string;
+    imageUrl: string;
     quantity: number;
   }>;
   dailyRentRate: number;

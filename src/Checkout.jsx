@@ -199,7 +199,9 @@ export default function Checkout() {
         hotelOrAccommodationName: formData.hotelName,
         roomNumber: formData.roomNumber,
         rentItems: selectedItems.map((item) => ({
-          monitorId: Number(item.id),
+          id: Number(item.id),
+          name: item.name,
+          imageUrl: item.imageUrl,
           quantity: item.quantity,
         })),
         dailyRentRate: dailyRate,

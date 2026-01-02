@@ -380,14 +380,26 @@ export default function PurchaseOrdersPage() {
                     <table className="order-items-list">
                         <thead>
                             <tr>
-                                <th>Monitor ID</th>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>ID</th>
                                 <th>Quantity</th>
                             </tr>
                         </thead>
                         <tbody>
                             {selectedOrder.rentItems && selectedOrder.rentItems.map((item, idx) => (
                                 <tr key={idx}>
-                                    <td>{item.monitorId}</td>
+                                    <td>
+                                        {item.imageUrl && (
+                                            <img 
+                                                src={item.imageUrl} 
+                                                alt={item.name} 
+                                                style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                                            />
+                                        )}
+                                    </td>
+                                    <td>{item.name}</td>
+                                    <td>{item.id || item.monitorId}</td>
                                     <td>{item.quantity}</td>
                                 </tr>
                             ))}
