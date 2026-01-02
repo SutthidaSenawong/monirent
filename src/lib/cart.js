@@ -8,6 +8,7 @@ import { create } from "zustand";
  * @property {string} description - Detailed description
  * @property {string} category - Monitor category
  * @property {number} price - Weekly Rental Price of the item
+ * @property {number} PricePerMonth - Monthly Rental Price of the item
  * @property {string} imageUrl - Image URL
  * @property {Object.<string, string>} spec - Specifications as key-value pairs
  * @property {number} quantity - Quantity of this item in cart

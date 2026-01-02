@@ -68,8 +68,59 @@ export default function Checkout() {
     (sum, item) => sum + calculateDailyPrice(item.price) * item.quantity,
     0
   );
+
+  // Calculate total price with monthly rate logic
+  const calculateTotalPrice = () => {
+    const deliveryFee = 200;
+    
+    const itemsTotal = selectedItems.reduce((sum, item) => {
+      const dailyPrice = calculateDailyPrice(item.price);
+      
+      // If rental period is 28 days or more, apply monthly rate logic
+      if (rentalDays >= 28 && item.PricePerMonth) {
+        const months = Math.floor(rentalDays / 28);
+        const remainingDaysAfterMonths = rentalDays % 28;
+        
+        const weeks = Math.floor(remainingDaysAfterMonths / 7);
+        const days = remainingDaysAfterMonths % 7;
+        
+        const monthlyPart = months * item.PricePerMonth;
+        const weeklyPart = weeks * item.price;
+        const dailyPart = days * dailyPrice;
+        
+        return sum + (monthlyPart + weeklyPart + dailyPart) * item.quantity;
+      }
+      
+      // Standard daily calculation
+      return sum + (dailyPrice * rentalDays) * item.quantity;
+    }, 0);
+
+    return itemsTotal + deliveryFee;
+  };
+
   const deliveryFee = 200;
-  const totalPrice = dailyRate * rentalDays + deliveryFee;
+  const totalPrice = calculateTotalPrice();
+  
+  // Calculate standard total (without monthly discount) for comparison
+  const standardTotal = dailyRate * rentalDays + deliveryFee;
+  const monthlyDiscount = standardTotal - totalPrice;
+
+  // Format rental duration text
+  const getRentalDurationText = () => {
+    if (rentalDays >= 28) {
+      const months = Math.floor(rentalDays / 28);
+      const remainingDaysAfterMonths = rentalDays % 28;
+      const weeks = Math.floor(remainingDaysAfterMonths / 7);
+      const days = remainingDaysAfterMonths % 7;
+      
+      let text = `${months} ${months === 1 ? "month" : "months"}`;
+      if (weeks > 0) text += ` ${weeks} ${weeks === 1 ? "week" : "weeks"}`;
+      if (days > 0) text += ` ${days} ${days === 1 ? "day" : "days"}`;
+      
+      return `${text} (${rentalDays} days)`;
+    }
+    return `${rentalDays} ${rentalDays === 1 ? "day" : "days"}`;
+  };
 
   // Redirect if cart is empty
   if (selectedItems.length === 0) {
@@ -447,7 +498,22 @@ export default function Checkout() {
           )}
 
           <div className='checkout-items-list'>
-            {selectedItems.map((item) => (
+            {selectedItems.map((item) => {
+              const dailyPrice = calculateDailyPrice(item.price);
+              let itemTotal = 0;
+              
+              if (rentalDays >= 28 && item.PricePerMonth) {
+                const months = Math.floor(rentalDays / 28);
+                const remainingDaysAfterMonths = rentalDays % 28;
+                const weeks = Math.floor(remainingDaysAfterMonths / 7);
+                const days = remainingDaysAfterMonths % 7;
+                
+                itemTotal = ((months * item.PricePerMonth) + (weeks * item.price) + (days * dailyPrice)) * item.quantity;
+              } else {
+                itemTotal = dailyPrice * rentalDays * item.quantity;
+              }
+
+              return (
               <div key={item.id} className='checkout-item'>
                 <img
                   src={item.imageUrl}
@@ -458,18 +524,21 @@ export default function Checkout() {
                   <h4>{item.name}</h4>
                   <p className='checkout-item-price'>
                     {formatPrice(item.price)} THB/week (
-                    {formatPrice(calculateDailyPrice(item.price))} THB/day) ×{" "}
+                    {formatPrice(dailyPrice)} THB/day) ×{" "}
                     {item.quantity}
                   </p>
+                  {rentalDays >= 28 && item.PricePerMonth && (
+                    <p className='checkout-item-price' style={{ color: '#10b981', fontSize: '0.8rem' }}>
+                      Monthly Rate: {formatPrice(item.PricePerMonth)} THB/month
+                    </p>
+                  )}
                 </div>
                 <div className='checkout-item-total'>
-                  {formatPrice(
-                    calculateDailyPrice(item.price) * item.quantity * rentalDays
-                  )}{" "}
+                  {formatPrice(itemTotal)}{" "}
                   THB
                 </div>
               </div>
-            ))}
+            )})}
           </div>
 
           <div className='checkout-summary-totals'>
@@ -484,13 +553,19 @@ export default function Checkout() {
             <div className='summary-row'>
               <span>Rental Days:</span>
               <span>
-                {rentalDays} {rentalDays === 1 ? "day" : "days"}
+                {getRentalDurationText()}
               </span>
             </div>
             <div className='summary-row'>
               <span>Delivery Fee:</span>
               <span>{formatPrice(deliveryFee)} THB</span>
             </div>
+            {monthlyDiscount > 0 && (
+              <div className='summary-row'>
+                <span>Monthly Discount:</span>
+                <span style={{ color: '#10b981' }}>{`- ${formatPrice(monthlyDiscount)} THB`}</span>
+              </div>
+            )}
             <div className='summary-row total'>
               <span>Total:</span>
               <span>

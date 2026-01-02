@@ -30,3 +30,16 @@ type PurchaseOrder = {
     message: string;
   }>;
 }
+
+type Item = {
+  id: string;
+  name: string;
+  info: string;
+  description: string;
+  category: string;
+  price: number; // weekly price
+  PricePerMonth: number;
+  imageUrl: string;
+  spec: Record<string, string>;
+  quantity: number;
+}

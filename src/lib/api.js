@@ -94,7 +94,10 @@ export async function savePurchaseInfo(purchaseOrder) {
   // const ordersCollectionRef = collection(db, "purchaseOrders");
   try {
     // Use the provided ID as the document key
-    await setDoc(doc(db, "purchaseOrders", String(purchaseOrder.id)), purchaseOrder);
+    await setDoc(
+      doc(db, "purchaseOrders", String(purchaseOrder.id)),
+      purchaseOrder
+    );
     return purchaseOrder.id;
   } catch (e) {
     console.error("Error adding document: ", e);
@@ -138,7 +141,7 @@ export async function getPurchaseOrders({
     // But if the user wants to filter within date range...
     // Let's assume if ID is provided, we search by ID.
     // If not, we use date range.
-    
+
     if (status) {
       constraints.push(where("status", "==", status));
     }
@@ -149,7 +152,7 @@ export async function getPurchaseOrders({
     if (dateTo) {
       constraints.push(where("rentalPeriodFrom", "<=", dateTo));
     }
-    
+
     // Order by rentalPeriodFrom for the range filter
     constraints.push(orderBy("rentalPeriodFrom", "desc"));
   }
@@ -172,7 +175,7 @@ export async function getPurchaseOrders({
 
   const q = query(ordersCollectionRef, ...constraints);
   const snapshot = await getDocs(q);
-  
+
   const orders = snapshot.docs.map((doc) => ({
     ...doc.data(),
     // id is already in data, but good to ensure
@@ -188,19 +191,19 @@ export async function getPurchaseOrders({
 export async function updatePurchaseOrderStatus(id, newStatus, oldStatus) {
   const orderRef = doc(db, "purchaseOrders", id);
   const timestamp = new Date().toISOString();
-  
+
   try {
-      await updateDoc(orderRef, {
-          status: newStatus,
-          updatedAt: timestamp,
-          logs: arrayUnion({
-              timestamp: timestamp,
-              message: `update status from ${oldStatus} to ${newStatus}`
-          })
-      });
-      return true;
+    await updateDoc(orderRef, {
+      status: newStatus,
+      updatedAt: timestamp,
+      logs: arrayUnion({
+        timestamp: timestamp,
+        message: `update status from ${oldStatus} to ${newStatus}`,
+      }),
+    });
+    return true;
   } catch (e) {
-      console.error("Error updating status: ", e);
-      throw e;
+    console.error("Error updating status: ", e);
+    throw e;
   }
 }
