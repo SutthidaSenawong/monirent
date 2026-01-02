@@ -604,13 +604,6 @@ export default function Checkout() {
               We will message you on WhatsApp at{" "}
               <strong>{formData.whatsapp}</strong>
             </p>
-<<<<<<< HEAD
-            git rebase --abort
-            <p className='modal-subtext'>
-              You will receive a confirmation email at {formData.email}
-            </p>
-=======
->>>>>>> 4401a15 (refactor: add lib/)
             <button onClick={handleCloseModal} className='rent-btn modal-btn'>
               Continue Shopping
             </button>

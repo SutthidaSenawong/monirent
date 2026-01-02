@@ -1,12 +1,8 @@
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
-=======
 import { getPurchaseOrders, updatePurchaseOrderStatus } from "./lib/api";
->>>>>>> 4401a15 (refactor: add lib/)
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { FaSearch, FaEye, FaTimes } from "react-icons/fa";
-import { getPurchaseOrders, updatePurchaseOrderStatus } from "../api";
 
 export default function PurchaseOrdersPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
