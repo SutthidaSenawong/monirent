@@ -591,7 +591,11 @@ export default function Checkout() {
                     }}
                     title='Copy Order ID'
                   >
-                    {copied ? <HiCheck size={20} /> : <HiClipboardCopy size={20} />}
+                    {copied ? (
+                      <HiCheck size={20} />
+                    ) : (
+                      <HiClipboardCopy size={20} />
+                    )}
                   </button>
                 </div>
               </div>
@@ -600,6 +604,7 @@ export default function Checkout() {
               We will message you on WhatsApp at{" "}
               <strong>{formData.whatsapp}</strong>
             </p>
+            git rebase --abort
             <p className='modal-subtext'>
               You will receive a confirmation email at {formData.email}
             </p>
