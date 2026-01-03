@@ -132,7 +132,6 @@ export async function getPurchaseOrders({
 
     // Priority 1: If status is provided, use it as primary filter
     if (status) {
-      console.log("Filtering by status:", status);
       constraints.push(where("status", "==", status));
       countConstraints.push(where("status", "==", status));
 

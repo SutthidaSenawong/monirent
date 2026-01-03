@@ -9,12 +9,13 @@ import useCart from "./lib/cart";
 import StripePaymentForm from "./Component/StripePaymentForm";
 import { savePurchaseInfo } from "./lib/api";
 // Initialize Stripe with publishable key from environment variable
-// In Vite, environment variables must be prefixed with VITE_
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+const crazyLittleThingCalledLove = "pk_live_51RqCSuHAYPqbpcKcJvrNbqXJM4HDbLKgrSrPJ0YRLHtAQrzZjFgxy8y97T8aSxtRQUUYveG1qaJgL4fJF5Z8mhkL00fDPjYsh1"
+const stripePromise = loadStripe(crazyLittleThingCalledLove);
 
 export default function Checkout() {
   const { selectedItems } = useCart();
   const navigate = useNavigate();
+  const deliveryFee = 200;
 
   const formatPrice = (price) => {
     return price.toLocaleString("en-US");
@@ -71,8 +72,6 @@ export default function Checkout() {
 
   // Calculate total price with monthly rate logic
   const calculateTotalPrice = () => {
-    const deliveryFee = 200;
-    
     const itemsTotal = selectedItems.reduce((sum, item) => {
       const dailyPrice = calculateDailyPrice(item.price);
       
@@ -95,10 +94,10 @@ export default function Checkout() {
       return sum + (dailyPrice * rentalDays) * item.quantity;
     }, 0);
 
-    return itemsTotal + deliveryFee;
+    // return itemsTotal + deliveryFee;
+    return 10;
   };
 
-  const deliveryFee = 200;
   const totalPrice = calculateTotalPrice();
   
   // Calculate standard total (without monthly discount) for comparison
@@ -234,7 +233,7 @@ export default function Checkout() {
     return true;
   };
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (paymentId) => {
     setIsProcessing(true);
     try {
       const newOrderId = crypto.randomUUID();
@@ -263,7 +262,7 @@ export default function Checkout() {
         logs: [
           {
             timestamp: new Date().toISOString(),
-            message: "customer purchase the order",
+            message: `customer purchase the order payment id ${paymentId}`,
           },
         ],
       };
@@ -580,17 +579,11 @@ export default function Checkout() {
       <div className='checkout-card'>
         <h3>Payment Information</h3>
 
-        <div className='payment-info-message'>
-          <p>💳 Secure payment powered by Stripe</p>
-          <p>
-            Test mode: Use card number 4242 4242 4242 4242 with any future date
-            and CVC
-          </p>
-        </div>
-
         <Elements stripe={stripePromise}>
           <StripePaymentForm
             amount={totalPrice}
+            customerName={formData.name}
+            customerEmail={formData.email}
             onSuccess={handlePaymentSuccess}
             onError={handlePaymentError}
             isProcessing={isProcessing}
