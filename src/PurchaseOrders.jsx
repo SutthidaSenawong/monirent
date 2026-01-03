@@ -9,7 +9,7 @@ export default function PurchaseOrdersPage() {
   const [password, setPassword] = useState("");
 
   // Filters
-  const [filterId, setFilterId] = useState("");
+  const [filterFullName, setFilterFullName] = useState("");
   const [dateRange, setDateRange] = useState([
     new Date(new Date().setDate(new Date().getDate() - 30)), // Default last 30 days
     new Date(new Date().setDate(new Date().getDate() + 30)),
@@ -55,7 +55,7 @@ export default function PurchaseOrdersPage() {
         }
 
         const result = await getPurchaseOrders({
-          id: filterId,
+          fullName: filterFullName,
           dateFrom: dateRange ? dateRange[0].toISOString() : null,
           dateTo: dateRange ? dateRange[1].toISOString() : null,
           status: filterStatus,
@@ -188,12 +188,12 @@ export default function PurchaseOrdersPage() {
 
       <div className='filters-container'>
         <div className='filter-group'>
-          <label>Order ID</label>
+          <label>Customer Name</label>
           <input
             type='text'
-            value={filterId}
-            onChange={(e) => setFilterId(e.target.value)}
-            placeholder='Search ID'
+            value={filterFullName}
+            onChange={(e) => setFilterFullName(e.target.value)}
+            placeholder='Search Name'
             className='filter-input'
           />
         </div>
@@ -254,7 +254,7 @@ export default function PurchaseOrdersPage() {
             <thead>
               <tr>
                 <th>#</th>
-                <th>ID</th>
+                <th>Name</th>
                 <th>Status</th>
                 <th>WhatsApp</th>
                 <th>Address</th>
@@ -267,10 +267,8 @@ export default function PurchaseOrdersPage() {
               {orders.map((order, index) => (
                 <tr key={order.id}>
                   <td>{(page - 1) * 25 + index + 1}</td>
-                  <td title={order.id}>
-                    <code className='order-id-code'>
-                      {order.id.substring(0, 6)}...
-                    </code>
+                  <td title={order.fullName}>
+                    {order.fullName}
                   </td>
                   <td>
                     <span className={getStatusBadgeClass(order.status)}>

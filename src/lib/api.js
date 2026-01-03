@@ -106,13 +106,13 @@ export async function savePurchaseInfo(purchaseOrder) {
 }
 
 // param:
-// id (optional)
+// fullName (optional) - partial match
 // date from (required)
 // date to (required)
 // status (optional)
 // pagination offset, limit
 export async function getPurchaseOrders({
-  id,
+  fullName,
   dateFrom,
   dateTo,
   status,
@@ -123,55 +123,47 @@ export async function getPurchaseOrders({
   let constraints = [];
   let countConstraints = [];
 
-  if (id) {
-    // If ID is provided, search by exact ID match
-    constraints.push(where("id", "==", id));
-    countConstraints = [...constraints];
+  // Build query based on available filters to avoid compound index requirements
+
+  // Priority 1: If status is provided, use it as primary filter
+  if (status) {
+    constraints.push(where("status", "==", status));
+    countConstraints.push(where("status", "==", status));
+
+    // For status queries, we'll order by createdAt instead of rentalPeriodFrom
+    // to avoid compound index requirements
+    constraints.push(orderBy("createdAt", "desc"));
   } else {
-    // Build query based on available filters to avoid compound index requirements
-
-    // Priority 1: If status is provided, use it as primary filter
-    if (status) {
-      constraints.push(where("status", "==", status));
-      countConstraints.push(where("status", "==", status));
-
-      // For status queries, we'll order by createdAt instead of rentalPeriodFrom
-      // to avoid compound index requirements
-      constraints.push(orderBy("createdAt", "desc"));
-    } else {
-      // Priority 2: If no status, use date range filters with rentalPeriodFrom
-      if (dateFrom) {
-        constraints.push(where("rentalPeriodFrom", ">=", dateFrom));
-        countConstraints.push(where("rentalPeriodFrom", ">=", dateFrom));
-      }
-      if (dateTo) {
-        constraints.push(where("rentalPeriodFrom", "<=", dateTo));
-        countConstraints.push(where("rentalPeriodFrom", "<=", dateTo));
-      }
-
-      // Order by rentalPeriodFrom for date range queries
-      constraints.push(orderBy("rentalPeriodFrom", "desc"));
+    // Priority 2: If no status, use date range filters with rentalPeriodFrom
+    if (dateFrom) {
+      constraints.push(where("rentalPeriodFrom", ">=", dateFrom));
+      countConstraints.push(where("rentalPeriodFrom", ">=", dateFrom));
     }
+    if (dateTo) {
+      constraints.push(where("rentalPeriodFrom", "<=", dateTo));
+      countConstraints.push(where("rentalPeriodFrom", "<=", dateTo));
+    }
+
+    // Order by rentalPeriodFrom for date range queries
+    constraints.push(orderBy("rentalPeriodFrom", "desc"));
   }
 
-  // Get total count (skip count for ID searches since it's either 0 or 1)
+  // Get total count
   let totalCount = 0;
-  if (!id) {
+  try {
+    const countQ = query(ordersCollectionRef, ...countConstraints);
+    const countSnapshot = await getCountFromServer(countQ);
+    totalCount = countSnapshot.data().count;
+  } catch (err) {
+    console.error("Error getting count:", err);
+    // Fallback: get all docs and count them (less efficient but works)
     try {
-      const countQ = query(ordersCollectionRef, ...countConstraints);
-      const countSnapshot = await getCountFromServer(countQ);
-      totalCount = countSnapshot.data().count;
-    } catch (err) {
-      console.error("Error getting count:", err);
-      // Fallback: get all docs and count them (less efficient but works)
-      try {
-        const fallbackQ = query(ordersCollectionRef, ...countConstraints);
-        const fallbackSnapshot = await getDocs(fallbackQ);
-        totalCount = fallbackSnapshot.docs.length;
-      } catch (fallbackErr) {
-        console.error("Fallback count also failed:", fallbackErr);
-        totalCount = 0;
-      }
+      const fallbackQ = query(ordersCollectionRef, ...countConstraints);
+      const fallbackSnapshot = await getDocs(fallbackQ);
+      totalCount = fallbackSnapshot.docs.length;
+    } catch (fallbackErr) {
+      console.error("Fallback count also failed:", fallbackErr);
+      totalCount = 0;
     }
   }
 
@@ -190,28 +182,37 @@ export async function getPurchaseOrders({
     // id is already in data, but good to ensure
   }));
 
-  // If we used status filter but still need to apply date filtering,
-  // do it client-side for better user experience
-  if (status && (dateFrom || dateTo)) {
+  // Client-side filtering for fullName (partial match) and date range if status was used
+  if (fullName || (status && (dateFrom || dateTo))) {
     orders = orders.filter((order) => {
-      const orderDate = new Date(order.rentalPeriodFrom);
-      let matchesDate = true;
+      let matches = true;
 
-      if (dateFrom) {
-        matchesDate = matchesDate && orderDate >= new Date(dateFrom);
-      }
-      if (dateTo) {
-        matchesDate = matchesDate && orderDate <= new Date(dateTo);
+      // Filter by fullName (case-insensitive partial match)
+      if (fullName) {
+        const orderName = (order.fullName || "").toLowerCase();
+        const searchName = fullName.toLowerCase();
+        matches = matches && orderName.includes(searchName);
       }
 
-      return matchesDate;
+      // Filter by date range if status was used as primary filter
+      if (status && (dateFrom || dateTo)) {
+        const orderDate = new Date(order.rentalPeriodFrom);
+        if (dateFrom) {
+          matches = matches && orderDate >= new Date(dateFrom);
+        }
+        if (dateTo) {
+          matches = matches && orderDate <= new Date(dateTo);
+        }
+      }
+
+      return matches;
     });
   }
 
   return {
     orders,
     lastDoc: snapshot.docs[snapshot.docs.length - 1],
-    totalCount: id ? orders.length : totalCount,
+    totalCount: fullName ? orders.length : totalCount,
   };
 }
 
