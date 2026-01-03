@@ -443,6 +443,49 @@ export default function PurchaseOrdersPage() {
               </div>
             </div>
 
+            <div className='order-detail-section'>
+              <h3>Logs</h3>
+              <div
+                style={{
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                  border: "1px solid #eee",
+                  borderRadius: "4px",
+                  padding: "10px",
+                  backgroundColor: "#f9fafb",
+                }}
+              >
+                {selectedOrder.logs && selectedOrder.logs.length > 0 ? (
+                  [...selectedOrder.logs].reverse().map((log, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        marginBottom: "8px",
+                        borderBottom: "1px solid #e5e7eb",
+                        paddingBottom: "8px",
+                        fontSize: "0.9rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          color: "#6b7280",
+                          fontSize: "0.8rem",
+                          marginBottom: "2px",
+                        }}
+                      >
+                        {new Date(log.timestamp).toLocaleString()}
+                      </div>
+                      <div style={{ color: "#374151" }}>{log.message}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ color: "#9ca3af", fontStyle: "italic" }}>
+                    No logs available
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className='status-update-section'>
               <div className='filter-group' style={{ flex: 1 }}>
                 <label>Update Status</label>

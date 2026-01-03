@@ -94,8 +94,7 @@ export default function Checkout() {
       return sum + (dailyPrice * rentalDays) * item.quantity;
     }, 0);
 
-    // return itemsTotal + deliveryFee;
-    return 10;
+    return itemsTotal + deliveryFee;
   };
 
   const totalPrice = calculateTotalPrice();
