@@ -1,11 +1,11 @@
-import React from "react";
-import { useParams, Link } from "react-router-dom";
-import { HiArrowNarrowLeft } from "react-icons/hi";
-import { LuShoppingCart } from "react-icons/lu";
-import { RiMessengerLine } from "react-icons/ri";
+import React from 'react';
+import { useParams, Link, useLocation } from 'react-router-dom';
+import { HiArrowNarrowLeft } from 'react-icons/hi';
+import { LuShoppingCart } from 'react-icons/lu';
+import { RiMessengerLine } from 'react-icons/ri';
 
-import useCart from "./lib/cart";
-import { getItem } from "./lib/api";
+import useCart from './lib/cart';
+import { getItem } from './lib/api';
 
 export default function MonitorsDetail() {
   const [monitor, setMonitor] = React.useState(null);
@@ -13,6 +13,7 @@ export default function MonitorsDetail() {
   const [error, setError] = React.useState(null);
   const { id } = useParams();
   const { addItem, selectedItems } = useCart();
+  const location = useLocation();
 
   const handleAddToCart = () => {
     if (monitor) {
@@ -52,55 +53,57 @@ export default function MonitorsDetail() {
   if (error) {
     return <h1>There was an error: {error.message}</h1>;
   }
+  const search = location.state?.search || '';
+  const category = location.state?.category || 'all';
 
   return (
     <div>
       {monitor && (
         <div>
-          <Link to='..' relative='path'>
-            <p className='back-btn'>
-              <HiArrowNarrowLeft /> Back to all monitors
+          <Link to={`..${search}`} relative="path">
+            <p className="back-btn">
+              <HiArrowNarrowLeft /> Back to {category}
             </p>
           </Link>
-          <div className='detail-responsive-container'>
-            <div className='monitor-detail-img-container'>
+          <div className="detail-responsive-container">
+            <div className="monitor-detail-img-container">
               <img src={monitor.imageUrl} alt={monitor.name} />
             </div>
-            <div className='detail-container'>
-              <div className='detail-top-container'>
+            <div className="detail-container">
+              <div className="detail-top-container">
                 <h2>{monitor.name}</h2>
                 <p>{monitor.description}</p>
-                <p className='price'>
+                <p className="price">
                   <span>{monitor.price} THB</span>/week
                 </p>
 
-                <div className='detail-actions'>
+                <div className="detail-actions">
                   <button
                     onClick={handleAddToCart}
-                    className='rent-btn add-to-cart-detail-btn'
+                    className="rent-btn add-to-cart-detail-btn"
                   >
                     <LuShoppingCart size={20} />
-                    {isInCart ? `In Cart (${quantity})` : "Add to Cart"}
+                    {isInCart ? `In Cart (${quantity})` : 'Add to Cart'}
                   </button>
                   <a
-                    href='http://m.me/280517075156100'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='messenger-icon-btn'
-                    aria-label='Contact us on Messenger'
+                    href="http://m.me/280517075156100"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="messenger-icon-btn"
+                    aria-label="Contact us on Messenger"
                   >
                     <RiMessengerLine size={24} />
                   </a>
                 </div>
               </div>
 
-              <div className='specifications'>
+              <div className="specifications">
                 <h3>Specifications</h3>
                 <p>{monitor.info}</p>
-                <ul className='specifications-list'>
+                <ul className="specifications-list">
                   {Object.entries(monitor.spec).map(([key, value]) => (
                     <li key={key}>
-                      <div className='spec'>
+                      <div className="spec">
                         <strong>{key}:</strong> {value}
                       </div>
                     </li>

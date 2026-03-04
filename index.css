@@ -309,6 +309,39 @@ span {
     #0000 149.815vh
   );
 }
+.h2-top {
+  margin: 30px;
+  margin-left: 0px;
+}
+.category {
+  height: 34px;
+  padding: 6px 26px;
+  margin-right: 30px;
+  margin-bottom: 30px;
+  font-style: normal;
+  font-weight: 500;
+  border: none;
+  border-radius: 5px;
+  background-color: #006edb;
+  color: #fff;
+  transition: 200ms all cubic-bezier(0.4, 0, 0.2, 1);
+}
+.category:hover {
+  background-color: #b2dff9;
+  color: #111827;
+}
+.clear-filters {
+  margin-left: -20px;
+  height: 34px;
+  padding: 6px 26px;
+  font-style: normal;
+  font-weight: 500;
+  border: none;
+  border-radius: 5px;
+  text-decoration: underline;
+  background-color: transparent;
+  color: #4d4d4d;
+}
 
 /* Monitor Detail */
 
@@ -1130,11 +1163,11 @@ span {
     width: 120px;
     height: 120px;
   }
-  
+
   .cart-item-price {
     min-width: 120px;
   }
-  
+
   .cart-summary {
     display: flex;
     flex-direction: row;
@@ -1246,7 +1279,7 @@ span {
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   margin-top: 5px;
   padding: 10px;
 }
