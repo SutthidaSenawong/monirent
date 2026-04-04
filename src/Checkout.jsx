@@ -17,6 +17,11 @@ export default function Checkout() {
   const navigate = useNavigate();
   const deliveryFee = 200;
 
+  // the first available rental date is tomorrow, it is impossible to deliver on the same day
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+
   const formatPrice = (price) => {
     return price.toLocaleString("en-US");
   };
@@ -319,7 +324,7 @@ export default function Checkout() {
                 onChange={handleDateChange}
                 value={formData.rentalPeriod}
                 selectRange={true}
-                minDate={new Date()}
+                minDate={tomorrow}
                 className='rental-calendar'
               />
             </div>
