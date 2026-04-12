@@ -7,7 +7,7 @@ import ItemDetailPage from "./src/ItemDetailPage";
 import Home from "./src/Component/Home";
 import Cart from "./src/Cart";
 import Checkout from "./src/Checkout";
-import PurchaseOrdersPage from "./src/PurchaseOrders";
+import PurchaseOrdersPage from "./src/PurchaseOrdersPage";
 
 function App() {
   return (

@@ -57,6 +57,30 @@ export async function getItem(id) {
   };
 }
 
+export async function getShopConfig() {
+  try {
+    const docRef = doc(db, "configs", "website");
+    const snapshot = await getDoc(docRef);
+    if (snapshot.exists()) {
+      return snapshot.data();
+    }
+    return { isOpen: true };
+  } catch (e) {
+    console.error("Error fetching shop config: ", e);
+    return { isOpen: true };
+  }
+}
+
+export async function setShopConfig(isOpen) {
+  try {
+    const docRef = doc(db, "configs", "website");
+    await setDoc(docRef, { isOpen }, { merge: true });
+  } catch (e) {
+    console.error("Error updating shop config: ", e);
+    throw e;
+  }
+}
+
 /**
  * @typedef {Object} PurchaseOrder
  * @property {string} id - primary key (UUID)

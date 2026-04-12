@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getPurchaseOrders, updatePurchaseOrderStatus } from "./lib/api";
+import { getPurchaseOrders, updatePurchaseOrderStatus, getShopConfig, setShopConfig } from "./lib/api";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { FaSearch, FaEye, FaTimes } from "react-icons/fa";
@@ -33,12 +33,36 @@ export default function PurchaseOrdersPage() {
   const [newStatus, setNewStatus] = useState("");
   const [updating, setUpdating] = useState(false);
 
+  // Shop open/close toggle
+  const [shopIsOpen, setShopIsOpen] = useState(true);
+  const [shopToggleLoading, setShopToggleLoading] = useState(false);
+
   const handleLogin = (e) => {
     e.preventDefault();
     if (password === "tongpub") {
       setIsAuthenticated(true);
     } else {
       alert("Incorrect password");
+    }
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    getShopConfig().then((config) => {
+      setShopIsOpen(config.isOpen !== false);
+    });
+  }, [isAuthenticated]);
+
+  const handleToggleShop = async (e) => {
+    const next = e.target.checked;
+    setShopToggleLoading(true);
+    try {
+      await setShopConfig(next);
+      setShopIsOpen(next);
+    } catch {
+      alert("Failed to update shop status");
+    } finally {
+      setShopToggleLoading(false);
     }
   };
 
@@ -184,7 +208,21 @@ export default function PurchaseOrdersPage() {
 
   return (
     <div className='purchase-orders-page'>
-      <h1>Purchase Orders</h1>
+      <div className='page-header-row'>
+        <h1>Purchase Orders</h1>
+        <label className='shop-toggle-wrapper'>
+          <span className='shop-toggle-label'>{shopIsOpen ? 'Open' : 'Closed'}</span>
+          <div className='toggle-switch'>
+            <input
+              type='checkbox'
+              checked={shopIsOpen}
+              onChange={handleToggleShop}
+              disabled={shopToggleLoading}
+            />
+            <span className='toggle-slider' />
+          </div>
+        </label>
+      </div>
 
       <div className='filters-container'>
         <div className='filter-group'>

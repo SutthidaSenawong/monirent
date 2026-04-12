@@ -4,7 +4,7 @@ import { IoMdAdd } from 'react-icons/io';
 import useCart from './lib/cart';
 
 import Slide from './Slide';
-import { getItems } from './lib/api';
+import { getItems, getShopConfig } from './lib/api';
 
 export default function ItemsPage() {
   const [items, setItems] = React.useState([]);
@@ -12,14 +12,16 @@ export default function ItemsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get('category');
   const [error, setError] = React.useState(null);
+  const [isOpen, setIsOpen] = React.useState(true);
   const { addItem, selectedItems } = useCart();
 
   React.useEffect(() => {
     async function loadItems() {
       setLoading(true);
       try {
-        const data = await getItems();
+        const [data, config] = await Promise.all([getItems(), getShopConfig()]);
         setItems(data);
+        setIsOpen(config.isOpen !== false);
       } catch (err) {
         setError(err);
       } finally {
@@ -44,7 +46,7 @@ export default function ItemsPage() {
     const quantity = cartItem?.quantity || 0;
 
     return (
-      <div key={item.id}>
+      <div key={item.id} className={!isOpen ? 'item-link--closed' : ''}>
         <Link
           to={`/rent-monitors-chiangmai/${item.id}`}
           state={{
@@ -52,11 +54,17 @@ export default function ItemsPage() {
             type: typeFilter,
           }}
         >
-          <div className="item-container">
+          <div className={`item-container${!isOpen ? ' item-container--closed' : ''}`}>
+            {!isOpen && (
+              <div className="item-closed-overlay">
+                <span className="item-closed-label">Out of Stock</span>
+              </div>
+            )}
             <button
               onClick={(e) => handleAddToCart(e, item)}
               className="add-to-cart-btn"
               aria-label={`Add ${item.name} to cart`}
+              disabled={!isOpen}
             >
               <IoMdAdd size={20} />
             </button>
