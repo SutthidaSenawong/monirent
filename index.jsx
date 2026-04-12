@@ -2,8 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./src/Component/Layout";
-import Monitors from "./src/Monitors";
-import MonitorsDetail from "./src/MonitorsDetail";
+import ItemsPage from "./src/ItemsPage";
+import ItemDetailPage from "./src/ItemDetailPage";
 import Home from "./src/Component/Home";
 import Cart from "./src/Cart";
 import Checkout from "./src/Checkout";
@@ -15,10 +15,10 @@ function App() {
       <Routes>
         <Route path='/' element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path='/rent-monitors-chiangmai' element={<Monitors />} />
+          <Route path='/rent-monitors-chiangmai' element={<ItemsPage />} />
           <Route
             path='/rent-monitors-chiangmai/:id'
-            element={<MonitorsDetail />}
+            element={<ItemDetailPage />}
           />
           <Route path='/rent-monitors-chiangmai/cart' element={<Cart />} />
           <Route
