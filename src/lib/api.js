@@ -32,37 +32,53 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 // Refactoring the fetching functions below
-const monitorsCollectionRef = collection(db, "monitors");
+const itemsCollection = collection(db, "items");
 
 export async function getItems() {
-  // กำหนด query เรียง category ก่อน แล้วเรียง id ต่อ
-  // const q = query(
-  //   monitorsCollectionRef,
-  //   orderBy('category', 'asc'),
-  //   orderBy('id', 'asc')
-  // );
-
-  const snapshot = await getDocs(monitorsCollectionRef);
-  const monitors = snapshot.docs.map((doc) => ({
+  const snapshot = await getDocs(itemsCollection);
+  const items = snapshot.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
   }));
-  // console.log(monitors);
-  monitors.sort((a, b) => {
+  items.sort((a, b) => {
     if (a.category < b.category) return -1;
     if (a.category > b.category) return 1;
     // แปลง id เป็น number ถ้า id เป็น string
     return Number(a.id) - Number(b.id);
   });
-  return monitors;
+  return items;
 }
 export async function getItem(id) {
-  const docRef = doc(db, "monitors", id);
+  const docRef = doc(db, "items", id);
   const snapshot = await getDoc(docRef);
   return {
     ...snapshot.data(),
     id: snapshot.id,
   };
+}
+
+export async function getShopConfig() {
+  try {
+    const docRef = doc(db, "configs", "website");
+    const snapshot = await getDoc(docRef);
+    if (snapshot.exists()) {
+      return snapshot.data();
+    }
+    return { isOpen: true };
+  } catch (e) {
+    console.error("Error fetching shop config: ", e);
+    return { isOpen: true };
+  }
+}
+
+export async function setShopConfig(isOpen) {
+  try {
+    const docRef = doc(db, "configs", "website");
+    await setDoc(docRef, { isOpen }, { merge: true });
+  } catch (e) {
+    console.error("Error updating shop config: ", e);
+    throw e;
+  }
 }
 
 /**

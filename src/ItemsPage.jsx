@@ -4,60 +4,67 @@ import { IoMdAdd } from 'react-icons/io';
 import useCart from './lib/cart';
 
 import Slide from './Slide';
-import { getItems } from './lib/api';
+import { getItems, getShopConfig } from './lib/api';
 
-export default function Monitors() {
-  const [monitors, setMonitors] = React.useState([]);
+export default function ItemsPage() {
+  const [items, setItems] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get('category');
   const [error, setError] = React.useState(null);
+  const [isOpen, setIsOpen] = React.useState(true);
   const { addItem, selectedItems } = useCart();
 
   React.useEffect(() => {
-    async function loadMonitors() {
+    async function loadItems() {
       setLoading(true);
       try {
-        const data = await getItems();
-        setMonitors(data);
-        // console.log(monitors.imageUrl);
+        const [data, config] = await Promise.all([getItems(), getShopConfig()]);
+        setItems(data);
+        setIsOpen(config.isOpen !== false);
       } catch (err) {
         setError(err);
       } finally {
         setLoading(false);
       }
     }
-    loadMonitors();
+    loadItems();
   }, []);
 
-  const displayedMonitors = typeFilter
-    ? monitors.filter((monitor) => monitor.category === typeFilter)
-    : monitors;
+  const displayItems = typeFilter
+    ? items.filter((item) => item.category === typeFilter)
+    : items;
 
-  const handleAddToCart = (e, monitor) => {
+  const handleAddToCart = (e, item) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(monitor);
+    addItem(item);
   };
 
-  const monitorsElements = displayedMonitors.map((monitor) => {
-    const cartItem = selectedItems.find((item) => item.id === monitor.id);
+  const itemList = displayItems.map((item) => {
+    const cartItem = selectedItems.find((cartItem) => cartItem.id === item.id);
     const quantity = cartItem?.quantity || 0;
 
     return (
-      <div key={monitor.id}>
+      <div key={item.id} className={!isOpen ? 'item-link--closed' : ''}>
         <Link
-          to={`/rent-monitors-chiangmai/${monitor.id}`}
+          to={`/rent-monitors-chiangmai/${item.id}`}
           state={{
             search: `?${searchParams.toString()}`,
             type: typeFilter,
           }}
         >
-          <div className="monitor-container">
+          <div className={`item-container${!isOpen ? ' item-container--closed' : ''}`}>
+            {!isOpen && (
+              <div className="item-closed-overlay">
+                <span className="item-closed-label">Out of Stock</span>
+              </div>
+            )}
             <button
-              onClick={(e) => handleAddToCart(e, monitor)}
+              onClick={(e) => handleAddToCart(e, item)}
               className="add-to-cart-btn"
-              aria-label={`Add ${monitor.name} to cart`}
+              aria-label={`Add ${item.name} to cart`}
+              disabled={!isOpen}
             >
               <IoMdAdd size={20} />
             </button>
@@ -65,16 +72,16 @@ export default function Monitors() {
               <span className="cart-quantity-badge">{quantity}</span>
             )}
             <img
-              src={`${monitor.imageUrl}`}
-              alt={monitor.name}
-              className="monitor-img"
+              src={`${item.imageUrl}`}
+              alt={item.name}
+              className="item-img"
             />
 
             <div>
-              <h3>{monitor.name}</h3>
-              <p>{monitor.description}</p>
+              <h3>{item.name}</h3>
+              <p>{item.description}</p>
               <p>
-                <span>{monitor.price} THB</span>/week
+                <span>{item.price} THB</span>/week
               </p>
             </div>
           </div>
@@ -148,7 +155,7 @@ export default function Monitors() {
           </button>
         ) : null}
       </div>
-      <div className="all-monitors">{monitorsElements}</div>
+      <div className="all-items">{itemList}</div>
     </>
   );
 }

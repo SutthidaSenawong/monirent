@@ -83,14 +83,14 @@ export default function Cart() {
       <div>
         <Link to='/rent-monitors-chiangmai' relative='path'>
           <p className='back-btn'>
-            <HiArrowNarrowLeft /> Back to all monitors
+            <HiArrowNarrowLeft /> Back to all items
           </p>
         </Link>
         <div className='empty-cart'>
           <h2>Your cart is empty</h2>
-          <p>Add some monitors to get started!</p>
+          <p>Add some items to get started!</p>
           <Link to='/rent-monitors-chiangmai' className='rent-btn'>
-            Browse Monitors
+            Browse Items
           </Link>
         </div>
       </div>
@@ -101,7 +101,7 @@ export default function Cart() {
     <div className='cart-page'>
       <Link to='/rent-monitors-chiangmai' relative='path'>
         <p className='back-btn'>
-          <HiArrowNarrowLeft /> Back to all monitors
+          <HiArrowNarrowLeft /> Back to all items
         </p>
       </Link>
       <h2>

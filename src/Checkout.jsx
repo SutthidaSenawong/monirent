@@ -131,14 +131,14 @@ export default function Checkout() {
       <div>
         <Link to='/rent-monitors-chiangmai' relative='path'>
           <p className='back-btn'>
-            <HiArrowNarrowLeft /> Back to all monitors
+            <HiArrowNarrowLeft /> Back to all items
           </p>
         </Link>
         <div className='empty-cart'>
           <h2>Your cart is empty</h2>
-          <p>Add some monitors to checkout!</p>
+          <p>Add some items to checkout!</p>
           <Link to='/rent-monitors-chiangmai' className='rent-btn'>
-            Browse Monitors
+            Browse Items
           </Link>
         </div>
       </div>
@@ -291,7 +291,7 @@ export default function Checkout() {
 
   const handleCloseModal = () => {
     setShowSuccessModal(false);
-    // Redirect to home or monitors page
+    // Redirect to home or items page
     navigate("/rent-monitors-chiangmai");
   };
 
