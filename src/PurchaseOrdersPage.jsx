@@ -55,6 +55,11 @@ export default function PurchaseOrdersPage() {
 
   const handleToggleShop = async (e) => {
     const next = e.target.checked;
+    const action = next ? "open" : "close";
+    if (!window.confirm(`Are you sure you want to ${action} the shop?`)) {
+      e.target.checked = !next;
+      return;
+    }
     setShopToggleLoading(true);
     try {
       await setShopConfig(next);
