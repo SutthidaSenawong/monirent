@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { IoMdAdd } from 'react-icons/io';
-import useCart from './lib/cart';
+import useCart, { getStock } from './lib/cart';
 
 import Slide from './Slide';
 import { getItems, getShopConfig } from './lib/api';
@@ -44,6 +44,9 @@ export default function ItemsPage() {
   const itemList = displayItems.map((item) => {
     const cartItem = selectedItems.find((cartItem) => cartItem.id === item.id);
     const quantity = cartItem?.quantity || 0;
+    const stock = getStock(item);
+    const isOutOfStock = stock <= 0;
+    const isUnavailable = !isOpen || isOutOfStock;
 
     return (
       <div key={item.id} className={!isOpen ? 'item-link--closed' : ''}>
@@ -54,8 +57,12 @@ export default function ItemsPage() {
             type: typeFilter,
           }}
         >
-          <div className={`item-container${!isOpen ? ' item-container--closed' : ''}`}>
-            {!isOpen && (
+          <div
+            className={`item-container${isUnavailable ? ' item-container--closed' : ''}${
+              isOpen && isOutOfStock ? ' item-container--sold-out' : ''
+            }`}
+          >
+            {isUnavailable && (
               <div className="item-closed-overlay">
                 <span className="item-closed-label">Out of Stock</span>
               </div>
@@ -64,7 +71,7 @@ export default function ItemsPage() {
               onClick={(e) => handleAddToCart(e, item)}
               className="add-to-cart-btn"
               aria-label={`Add ${item.name} to cart`}
-              disabled={!isOpen}
+              disabled={isUnavailable || quantity >= stock}
             >
               <IoMdAdd size={20} />
             </button>

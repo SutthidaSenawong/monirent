@@ -271,6 +271,10 @@ button:focus-visible {
 .item-link--closed {
   pointer-events: none;
 }
+/* Out of stock: greyed out like closed, but the card still opens the detail page */
+.item-container--sold-out {
+  cursor: pointer;
+}
 .shop-closed-banner {
   background-color: #fef3c7;
   border: 1px solid #f59e0b;
@@ -434,6 +438,25 @@ span {
   align-items: center;
   gap: 8px;
   justify-content: center;
+}
+
+.add-to-cart-detail-btn:disabled,
+.add-to-cart-detail-btn:disabled:hover {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.out-of-stock-badge {
+  display: inline-block;
+  background-color: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
 }
 
 .messenger-icon-btn {
@@ -656,6 +679,11 @@ span {
 
 .quantity-btn:hover {
   background-color: #e5e7eb;
+}
+
+.quantity-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .quantity-display {

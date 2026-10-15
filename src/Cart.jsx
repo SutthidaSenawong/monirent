@@ -61,6 +61,7 @@ export default function Cart() {
             <button
               onClick={() => updateQuantity(item.id, item.quantity + 1)}
               className='quantity-btn'
+              disabled={item.quantity >= item.stock}
               aria-label='Increase quantity'
             >
               <IoMdAdd size={16} />

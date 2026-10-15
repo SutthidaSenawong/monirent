@@ -4,7 +4,7 @@ import { HiArrowNarrowLeft } from 'react-icons/hi';
 import { LuShoppingCart } from 'react-icons/lu';
 import { RiMessengerLine } from 'react-icons/ri';
 
-import useCart from './lib/cart';
+import useCart, { getStock } from './lib/cart';
 import { getItem } from './lib/api';
 
 export default function ItemDetailPage() {
@@ -21,10 +21,13 @@ export default function ItemDetailPage() {
     }
   };
 
-  const isInCart =
-    item && selectedItems.some((item) => item.id === item.id);
-  const cartItem = selectedItems.find((item) => item?.id === item?.id);
+  const cartItem = item
+    ? selectedItems.find((cartItem) => cartItem.id === item.id)
+    : undefined;
+  const isInCart = Boolean(cartItem);
   const quantity = cartItem?.quantity || 0;
+  const stock = getStock(item);
+  const isOutOfStock = stock <= 0;
 
   React.useEffect(() => {
     async function loadItem() {
@@ -65,6 +68,9 @@ export default function ItemDetailPage() {
             </div>
             <div className="detail-container">
               <div className="detail-top-container">
+                {isOutOfStock && (
+                  <span className="out-of-stock-badge">Out of Stock</span>
+                )}
                 <h2>{item.name}</h2>
                 <p>{item.description}</p>
                 <p className="price">
@@ -75,9 +81,14 @@ export default function ItemDetailPage() {
                   <button
                     onClick={handleAddToCart}
                     className="rent-btn add-to-cart-detail-btn"
+                    disabled={quantity >= stock}
                   >
                     <LuShoppingCart size={20} />
-                    {isInCart ? `In Cart (${quantity})` : 'Add to Cart'}
+                    {isOutOfStock
+                      ? 'Out of Stock'
+                      : isInCart
+                        ? `In Cart (${quantity})`
+                        : 'Add to Cart'}
                   </button>
                   <a
                     href="http://m.me/280517075156100"

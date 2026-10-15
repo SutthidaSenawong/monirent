@@ -12,7 +12,17 @@ import { create } from "zustand";
  * @property {string} imageUrl - Image URL
  * @property {Object.<string, string>} spec - Specifications as key-value pairs
  * @property {number} quantity - Quantity of this item in cart
+ * @property {number} stock - Available stock, copied from the item's `quantity` field when added
  */
+
+/**
+ * Available stock of an item fetched from Firestore (its `quantity` field).
+ * @param {{quantity?: number | string}} item
+ * @returns {number}
+ */
+export function getStock(item) {
+  return Number(item?.quantity) || 0;
+}
 
 /**
  * @typedef {Object} CartState
@@ -29,6 +39,8 @@ const useCart = create((set) => ({
     set((state) => {
       const existingItem = state.selectedItems.find(i => i.id === item.id);
       if (existingItem) {
+        // Do not exceed available stock
+        if (existingItem.quantity >= existingItem.stock) return state;
         // Increment quantity if item already exists
         return {
           selectedItems: state.selectedItems.map(i =>
@@ -36,9 +48,11 @@ const useCart = create((set) => ({
           ),
         };
       }
+      const stock = getStock(item);
+      if (stock <= 0) return state;
       // Add new item with quantity 1
       return {
-        selectedItems: [...state.selectedItems, { ...item, quantity: 1 }],
+        selectedItems: [...state.selectedItems, { ...item, stock, quantity: 1 }],
       };
     }),
   removeItem: (itemId) =>
@@ -59,7 +73,9 @@ const useCart = create((set) => ({
       }
       return {
         selectedItems: state.selectedItems.map(item =>
-          item.id === itemId ? { ...item, quantity } : item
+          item.id === itemId
+            ? { ...item, quantity: Math.min(quantity, item.stock) }
+            : item
         ),
       };
     }),
